@@ -1,0 +1,225 @@
+<mvc:View
+    controllerName="customerindent.controller.WithOutVehTab"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    displayBlock="true">
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         WebDynpro INDMAIN → "Without Vehicle" tab (Indent Without Vehicle)
+         Header block + Material Details + SAVE DATA + open-indents table.
+    ═══════════════════════════════════════════════════════════════ -->
+    <VBox class="ciPage sapUiSmallPadding">
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 1 — INDENT WITHOUT VEHICLE (header + materials + save)
+        ═══════════════════════════════════════════ -->
+        <VBox class="ciCard">
+            <HBox class="ciCardHeader" justifyContent="SpaceBetween" alignItems="Center">
+                <Text text="Indent Without Vehicle" class="sapUiSmallMarginBegin"/>
+                <Button id="getOpenIndentsBtn"
+                        text="Get Open Indents"
+                        icon="sap-icon://search"
+                        press=".onGetOpenIndents"
+                        class="sapUiSmallMarginEnd"/>
+            </HBox>
+            <VBox class="ciCardBody">
+
+                <!-- Row 1: Loading Date | Customer | Sales Contract | Transporter GSTN -->
+                <layout:Grid defaultSpan="L3 M6 S12" hSpacing="1" vSpacing="0">
+
+                    <!-- HEADER_DATA.LOAD_DATE -->
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Loading Date" required="true" labelFor="novehLoadDate"
+                               class="sapUiTinyMarginBottom"/>
+                        <DatePicker id="novehLoadDate"
+                                    value="{novehForm>/BEGDA}"
+                                    valueFormat="yyyyMMdd"
+                                    displayFormat="dd.MM.yyyy"
+                                    placeholder="DD.MM.YYYY"
+                                    width="100%"/>
+                    </VBox>
+
+                    <!-- HEADER_DATA.KUNNR / NAME1  (ACTION: SELECT_MAT_AND_GSTN) -->
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Customer" required="true" labelFor="novehCustomer"
+                               class="sapUiTinyMarginBottom"/>
+                        <Input id="novehCustomer"
+                               value="{novehForm>/KUNNR_DESC}"
+                               placeholder="Select customer"
+                               showValueHelp="true"
+                               valueHelpRequest=".onCustomerSearch"
+                               editable="{= !${novehForm>/CH_INDT} }"
+                               width="100%"/>
+                    </VBox>
+
+                    <!-- NO_VEH_CONTRACT.VBELN1  (ACTION: SELECT_CONTRACT_NVEH) -->
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Sales Contract/Pricing Group" labelFor="novehContract"
+                               class="sapUiTinyMarginBottom"/>
+                        <Input id="novehContract"
+                               value="{novehForm>/CONTRACT1}"
+                               placeholder="Select contract"
+                               showValueHelp="true"
+                               valueHelpRequest=".onSalesContractSearch"
+                               width="100%"/>
+                    </VBox>
+
+                    <!-- GSTN.TPT_GSTN  (ACTION: ACTIVATE_GSTN) -->
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Transporter's GSTN" labelFor="novehTransporter"
+                               class="sapUiTinyMarginBottom"/>
+                        <Input id="novehTransporter"
+                               value="{novehForm>/TPT_GSTN}"
+                               placeholder="Select transporter GSTN"
+                               showValueHelp="true"
+                               valueHelpRequest=".onTransporterSearch"
+                               width="100%"/>
+                    </VBox>
+                </layout:Grid>
+
+                <!-- ─── Material Details group (GRP_MATERIAL) ─── -->
+                <VBox class="ciCompCard sapUiSmallMarginTop">
+                    <HBox class="ciCompHeader"><Text text="Material Details"/></HBox>
+                    <VBox class="ciCompBody">
+                        <layout:Grid defaultSpan="L3 M6 S12" hSpacing="1" vSpacing="0">
+
+                            <!-- MATERIAL1.MATNR dropdown (enabled WV_ENABLE.VWEN1);
+                                 items = eligible materials for the customer group -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Select Material 1" class="sapUiTinyMarginBottom"/>
+                                <Select id="novehMaterial1"
+                                        selectedKey="{novehForm>/MATNR1}"
+                                        forceSelection="false"
+                                        change=".onMaterial1Change"
+                                        enabled="{= ${novehForm>/ACTIVE1} === 'X' }"
+                                        width="100%"
+                                        items="{novehMat>/items}">
+                                    <core:Item key="{novehMat>MATNR}" text="{novehMat>MATNR}"/>
+                                </Select>
+                            </VBox>
+
+                            <!-- EXPORTING.CAPACITY1 (enabled WV_ENABLE.VWEN2) -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Quantity 1 (KL/MT)" required="true" labelFor="novehQty1"
+                                       class="sapUiTinyMarginBottom"/>
+                                <Input id="novehQty1"
+                                       value="{novehForm>/QUANTITY1}"
+                                       placeholder="0.000"
+                                       enabled="{= ${novehForm>/ACTIVE1} === 'X' }"
+                                       width="100%"/>
+                            </VBox>
+
+                            <!-- MATERIAL2.MATNR dropdown (enabled WV_ENABLE.VWEN3;
+                                 OI/TG/ON groups only); same eligible-material list -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Select Material 2" class="sapUiTinyMarginBottom"/>
+                                <Select id="novehMaterial2"
+                                        selectedKey="{novehForm>/MATNR2}"
+                                        forceSelection="false"
+                                        enabled="{= ${novehForm>/ACTIVE2} === 'X' }"
+                                        width="100%"
+                                        items="{novehMat>/items}">
+                                    <core:Item key="{novehMat>MATNR}" text="{novehMat>MATNR}"/>
+                                </Select>
+                            </VBox>
+
+                            <!-- EXPORTING.CAPACITY2 (enabled WV_ENABLE.VWEN4) -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Quantity 2 (KL/MT)" labelFor="novehQty2"
+                                       class="sapUiTinyMarginBottom"/>
+                                <Input id="novehQty2"
+                                       value="{novehForm>/QUANTITY2}"
+                                       placeholder="0.000"
+                                       enabled="{= ${novehForm>/ACTIVE2} === 'X' }"
+                                       width="100%"/>
+                            </VBox>
+                        </layout:Grid>
+                    </VBox>
+                </VBox>
+
+                <!-- SAVE DATA (BTN_SAVE_DATA → SAVE_NOV_VEH_INDENT, enabled WV_ENABLE.VW_SV1) -->
+                <HBox justifyContent="Center" class="sapUiMediumMarginTop sapUiSmallMarginBottom">
+                    <Button id="novehSaveBtn"
+                            text="SAVE DATA"
+                            type="Emphasized"
+                            icon="sap-icon://save"
+                            enabled="{= !!${novehForm>/MATNR1} }"
+                            press=".onSaveData"
+                            width="18rem"/>
+                </HBox>
+
+            </VBox>
+        </VBox>
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 2 — OPEN INDENTS (TBL_INDENTS + Delete/Close)
+        ═══════════════════════════════════════════ -->
+        <VBox class="ciCard">
+            <HBox class="ciCardHeader" alignItems="Center">
+                <Text text="Open Indents" class="sapUiSmallMarginBeginEnd"/>
+            </HBox>
+
+            <ScrollContainer id="novehScrollContainer"
+                             height="auto" width="100%"
+                             horizontal="true" vertical="false">
+                <Table id="novehIndentTable"
+                       items="{novehTable>/results}"
+                       sticky="ColumnHeaders"
+                       alternateRowColors="true"
+                       fixedLayout="true"
+                       class="ciIndentTable"
+                       width="100%"
+                       mode="MultiSelect"
+                       noDataText="No open indents. Select a customer and press Get Open Indents.">
+                    <columns>
+                        <Column width="9rem"><Text text="Order Number"/></Column>
+                        <Column width="7rem"><Text text="Order Date"/></Column>
+                        <Column width="13rem"><Text text="Customer"/></Column>
+                        <Column width="10rem"><Text text="Material-1"/></Column>
+                        <Column width="8rem" hAlign="End"><Text text="Quantity-1 (KL/MT)"/></Column>
+                        <Column width="10rem"><Text text="Material-2"/></Column>
+                        <Column width="8rem" hAlign="End"><Text text="Quantity-2 (KL/MT)"/></Column>
+                        <Column width="9rem"><Text text="Sales Contract"/></Column>
+                        <Column width="8rem" hAlign="End"><Text text="Balance Material-1"/></Column>
+                        <Column width="8rem" hAlign="End"><Text text="Balance Material-2"/></Column>
+                        <Column width="14rem"><Text text="Transporter with GSTN"/></Column>
+                        <Column width="14rem"><Text text="Message"/></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem vAlign="Middle">
+                            <cells>
+                                <Text text="{novehTable>ORDER_NO}"  wrapping="false"/>
+                                <Text text="{novehTable>BEGDA}"     wrapping="false"/>
+                                <Text text="{novehTable>KUNNR_DESC}" wrapping="false"/>
+                                <Text text="{novehTable>MATNR1}"    wrapping="false"/>
+                                <Text text="{novehTable>QUANTITY1}" wrapping="false"/>
+                                <Text text="{novehTable>MATNR2}"    wrapping="false"/>
+                                <Text text="{novehTable>QUANTITY2}" wrapping="false"/>
+                                <Text text="{novehTable>CONTRACT1}" wrapping="false"/>
+                                <Text text="{novehTable>BL_QTY1}"   wrapping="false"/>
+                                <Text text="{novehTable>BL_QTY2}"   wrapping="false"/>
+                                <Text text="{novehTable>TPT_GSTN}"  wrapping="false"/>
+                                <Text text="{novehTable>ERROR}"     wrapping="false"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </ScrollContainer>
+
+            <!-- BTN_DELETE_ORDER / BTN_CLOSE_ORDER -->
+            <HBox class="ciActionBar" justifyContent="Center" wrap="Wrap">
+                <Button text="Delete Order"
+                        type="Reject"
+                        icon="sap-icon://delete"
+                        press=".onDeleteOrder"
+                        class="sapUiSmallMarginEnd"/>
+                <Button text="Close Order"
+                        icon="sap-icon://sys-cancel"
+                        press=".onCloseOrder"/>
+            </HBox>
+        </VBox>
+
+    </VBox>
+</mvc:View>

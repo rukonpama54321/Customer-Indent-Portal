@@ -1,0 +1,43 @@
+<mvc:View
+    controllerName="customerindent.bulk.controller.ManageBulkIndent"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+    <Page
+        title="Manage Bulk Indent"
+        showNavButton="true"
+        navButtonPress=".onNavBack"
+        busy="{manageModel>/busy}">
+        <content>
+            <VBox width="100%">
+                <!-- Header Section with Logo -->
+                <VBox class="manage-header-section">
+                    <HBox alignItems="Center" wrap="Wrap">
+                        <Image src="img/logo.png" alt="Logo" class="sapUiTinyMarginEnd" />
+                        <VBox>
+                            <Title text="Manage Bulk Indent" level="H1" class="manage-page-title" />
+                            <Text text="Create bulk indent from selected sales document" class="manage-page-subtitle" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- Non-latest order warning -->
+                <MessageStrip
+                    text="{manageModel>/notLatestOrderMessage}"
+                    type="Warning"
+                    showIcon="true"
+                    showCloseButton="false"
+                    visible="{= !!${manageModel>/notLatestOrderMessage} }"
+                    class="sapUiSmallMargin sapUiSmallMarginBottom" />
+
+                <!-- Cards Container -->
+                <HBox class="sapUiSmallMargin" wrap="Wrap" alignItems="Stretch">
+                    <core:Fragment fragmentName="customerindent.bulk.view.ManageBulkIndent.OrderDetails" type="XML" />
+                    <core:Fragment fragmentName="customerindent.bulk.view.ManageBulkIndent.OrderItems" type="XML" />
+                </HBox>
+
+                <core:Fragment fragmentName="customerindent.bulk.view.ManageBulkIndent.AgentAllocations" type="XML" />
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

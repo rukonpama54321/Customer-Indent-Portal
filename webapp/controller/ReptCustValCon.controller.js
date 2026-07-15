@@ -1,0 +1,15 @@
+sap.ui.define([
+    "sap/ui/core/mvc/Controller",
+    "customerindent/util/UserInfo",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+    "customerindent/util/formatter",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageBox",
+    "sap/m/MessageToast",
+    "sap/ui/export/library",
+    "sap/ui/export/Spreadsheet"
+], function(e,t,r,o,a,s,i,l,n,u) {
+    "use strict";
+"use strict";var d=n.EdmType;return e.extend("customerindent.controller.ReptCustRecon",{formatter:a,onInit:function(){var e=sap.ui.core.UIComponent.getRouterFor(this);e.getRoute("ReptCustValCon").attachMatched(this._onRouteMatched,this);var r=t.getLoginInfo();this.oReportModel=this.getOwnerComponent().getModel("reportModel");var o=this.byId("iKunnr7");if(o){o.setValue(r.userId)}},onSearch7:function(){this.getView().byId("vboxTableBody7").setBusy(true);var e=this.getView();var t=[];var r=e.byId("iKunnr7").getValue();if(r){t.push(new sap.ui.model.Filter("CUST_USER_ID",sap.ui.model.FilterOperator.EQ,r))}if(!r){sap.m.MessageBox.error("Please enter Customer Code.");this.getView().byId("vboxTableBody7").setBusy(false);return}var o=e.byId("iWerks7").getSelectedKey();if(!o){sap.m.MessageBox.error("Please enter a Plant.");this.getView().byId("vboxTableBody7").setBusy(false);return}if(o){t.push(new sap.ui.model.Filter("WERKS",sap.ui.model.FilterOperator.EQ,o))}var a=new s;this.getView().setModel(a,"tableData7");var l=this;this.oReportModel.read("/ValidContractSet",{filters:t,success:function(e){if(e.results.length===0){i.alert("No Data Found for the Given Filters.");this.getView().byId("vboxTableBody7").setBusy(false);return}var t=e.results.find(e=>e.ROW_TYPE==="H")||{};var r=e.results.filter(e=>e.ROW_TYPE==="B");var o=e.results.filter(e=>e.ROW_TYPE==="F");var a=this.getView().getModel("tableData7");a.setData({Header:t,ValidContract:r,Footer:o});this.getView().byId("vboxTableBody7").setBusy(false)}.bind(this),error:function(e){console.error("OData Get Failed: ",e);this.getView().byId("vboxTableBody7").setBusy(false)}.bind(this)})},_onRouteMatched:function(e){this._clearScreen();this.getView().byId("vboxTableBody7").setBusy(false)},_clearScreen:function(){var e=this.getView();var r=e.getModel("tableData7");if(r){r.setData({Header:{},ValidContract:[],Footer:{}})}e.byId("iWerks7")?.setValue("");var o=t.getLoginInfo();if(o&&o.userId){e.byId("iKunnr7")?.setValue(o.userId)}else{e.byId("iKunnr7")?.setValue("")}},onDownloadExcel:function(){var e=this.getView().getModel("tableData7");var t=e.getProperty("/ValidContract");if(!t||t.length===0){l.show("No data to export.");return}var r=[{label:"Purchase Order",property:"PO_NO",type:d.String},{label:"Validity End Date",property:"VALID_DATE",type:d.String},{label:"PO Qty.",property:"ZMENG",type:d.String},{label:"Unit",property:"ZIEME",type:d.String},{label:"Balance Qty.",property:"RFMNG",type:d.String},{label:"Contract Value",property:"KZWI6",type:d.String}];var o={workbook:{columns:r},dataSource:t,fileName:"ValidContract/DeliveryOrder.xlsx"};var a=new u(o);a.build().then(function(){l.show("Export finished successfully.")}).catch(function(e){console.error("Export error:",e)})}})
+});

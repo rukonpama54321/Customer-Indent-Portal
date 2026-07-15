@@ -1,0 +1,355 @@
+{
+    "_version": "1.28.0",
+    "sap.app": {
+        "id": "customerindent",
+        "type": "application",
+        "i18n": {
+            "bundleUrl": "i18n/i18n.properties",
+            "supportedLocales": [
+                "",
+                "en"
+            ],
+            "fallbackLocale": ""
+        },
+        "applicationVersion": {
+            "version": "0.0.1"
+        },
+        "title": "{{appTitle}}",
+        "description": "{{appDescription}}",
+        "resources": "resources.json",
+        "sourceTemplate": {
+            "id": "@sap/generator-fiori:basic",
+            "version": "1.18.4",
+            "toolsId": "c997b609-3904-4197-9f17-5adc44cc7b47"
+        },
+        "dataSources": {
+            "mainService": {
+                "uri": "/sap/opu/odata/sap/ZSDI_ODATA_CUST_PORTAL_01_SRV/",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "odataVersion": "2.0"
+                }
+            },
+            "reportService": {
+                "uri": "/sap/opu/odata/sap/ZSD_CUST_INDENT_REPT_SRV/",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "odataVersion": "2.0"
+                }
+            },
+            "deepEntityService": {
+                "uri": "/sap/opu/odata/sap/ZSD_CUST_PORTAL_DEEPENTITY_SRV/",
+                "type": "OData",
+                "settings": {
+                    "odataVersion": "2.0"
+                }
+            },
+            "withoutvehService": {
+                "uri": "/sap/opu/odata/sap/ZSD_CUST_IND_NOVEH_SRV/",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "odataVersion": "2.0"
+                }
+            },
+            "inboundService": {
+                "uri": "/sap/opu/odata/sap/ZSD_CUST_IND_INBND_SRV/",
+                "type": "OData",
+                "settings": {
+                    "annotations": [],
+                    "odataVersion": "2.0"
+                }
+            }
+        }
+    },
+    "sap.ui": {
+        "technology": "UI5",
+        "icons": {
+            "icon": "",
+            "favIcon": "",
+            "phone": "",
+            "phone@2": "",
+            "tablet": "",
+            "tablet@2": ""
+        },
+        "deviceTypes": {
+            "desktop": true,
+            "tablet": true,
+            "phone": true
+        }
+    },
+    "sap.ui5": {
+        "flexEnabled": false,
+        "dependencies": {
+            "minUI5Version": "1.84.54",
+            "libs": {
+                "sap.m": {},
+                "sap.ui.core": {},
+                "sap.ui.layout": {},
+                "sap.ui.comp": {},
+                "sap.suite.ui.commons": {}
+            }
+        },
+        "contentDensities": {
+            "compact": true,
+            "cozy": true
+        },
+        "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "customerindent.i18n.i18n",
+                    "supportedLocales": [
+                        "",
+                        "en"
+                    ],
+                    "fallbackLocale": ""
+                }
+            },
+            "": {
+                "dataSource": "mainService",
+                "preload": true,
+                "settings": {}
+            },
+            "reportModel": {
+                "dataSource": "reportService",
+                "type": "sap.ui.model.odata.v2.ODataModel",
+                "settings": {
+                    "defaultBindingMode": "TwoWay",
+                    "defaultCountMode": "true",
+                    "useBatch": true
+                }
+            },
+            "deepEntityModel": {
+                "dataSource": "deepEntityService"
+            },
+            "withoutvehModel": {
+                "dataSource": "withoutvehService",
+                "type": "sap.ui.model.odata.v2.ODataModel",
+                "settings": {
+                    "defaultBindingMode": "TwoWay",
+                    "defaultCountMode": "None",
+                    "useBatch": false
+                }
+            },
+            "inboundModel": {
+                "dataSource": "inboundService",
+                "type": "sap.ui.model.odata.v2.ODataModel",
+                "settings": {
+                    "defaultBindingMode": "TwoWay",
+                    "defaultCountMode": "None",
+                    "useBatch": false,
+                    "refreshAfterChange": false
+                }
+            }
+        },
+        "resources": {
+            "css": [
+                {
+                    "uri": "css/style.css"
+                }
+            ]
+        },
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "viewType": "XML",
+                "async": true,
+                "viewPath": "customerindent.view",
+                "controlAggregation": "pages",
+                "controlId": "app",
+                "transition": "slide",
+                "clearControlAggregation": false
+            },
+            "routes": [
+                {
+                    "name": "RouteCustomerIndent",
+                    "pattern": ":?query:",
+                    "target": [
+                        "TargetCustomerIndent"
+                    ]
+                },
+                {
+                    "name": "EntryPage",
+                    "pattern": "EntryPage",
+                    "target": [
+                        "TargetEntryPage"
+                    ]
+                },
+                {
+                    "name": "BulkPortal",
+                    "pattern": "bulk",
+                    "target": [
+                        "TargetBulkPortal"
+                    ]
+                },
+                {
+                    "pattern": "ChangeIndentWithVehicleTab",
+                    "name": "ChangeIndentWithVehicleTab",
+                    "target": "ChangeIndentWithVehicleTab"
+                },
+                {
+                    "name": "ReportPage",
+                    "pattern": "ReportPage",
+                    "target": [
+                        "TargetReportPage"
+                    ]
+                },
+                {
+                    "name": "ReptCustomerIndent",
+                    "pattern": "ReptCustomerIndent",
+                    "target": [
+                        "TargetReptCustomerIndent"
+                    ]
+                },
+                {
+                    "name": "ReptCustAccStmt",
+                    "pattern": "ReptCustAccStmt",
+                    "target": [
+                        "TargetReptCustAccStmt"
+                    ]
+                },
+                {
+                    "name": "ReptCustCredit",
+                    "pattern": "ReptCustCredit",
+                    "target": [
+                        "TargetReptCustCredit"
+                    ]
+                },
+                {
+                    "name": "ReptCustDispDet",
+                    "pattern": "ReptCustDispDet",
+                    "target": [
+                        "TargetReptCustDispDet"
+                    ]
+                },
+                {
+                    "name": "ReptCustRecon",
+                    "pattern": "ReptCustRecon",
+                    "target": [
+                        "TargetReptCustRecon"
+                    ]
+                },
+                {
+                    "name": "ReptCustValCon",
+                    "pattern": "ReptCustValCon",
+                    "target": [
+                        "TargetReptCustValCon"
+                    ]
+                },
+                {
+                    "name": "ReptCustClosBal",
+                    "pattern": "ReptCustClosBal",
+                    "target": [
+                        "TargetReptCustClosBal"
+                    ]
+                },
+                {
+                    "name": "ReptCustPayDet",
+                    "pattern": "ReptCustPayDet",
+                    "target": [
+                        "TargetReptCustPayDet"
+                    ]
+                }
+            ],
+            "targets": {
+                "TargetCustomerIndent": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "CustomerIndent",
+                    "viewName": "CustomerIndent"
+                },
+                "TargetReportPage": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ReportPage",
+                    "viewName": "ReportPage"
+                },
+                "TargetEntryPage": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "EntryPage",
+                    "viewName": "EntryPage"
+                },
+                "TargetBulkPortal": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "BulkPortal",
+                    "viewName": "BulkPortal"
+                },
+                "ChangeIndentWithVehicleTab": {
+                    "viewName": "ChangeIndentWithVehicleTab",
+                    "viewLevel": 2
+                },
+                "TargetReptCustomerIndent": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ReptCustomerIndent",
+                    "viewName": "ReptCustomerIndent"
+                },
+                "TargetReptCustAccStmt": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ReptCustAccStmt",
+                    "viewName": "ReptCustAccStmt"
+                },
+                "TargetReptCustCredit": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ReptCustCredit",
+                    "viewName": "ReptCustCredit"
+                },
+                "TargetReptCustDispDet": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ReptCustDispDet",
+                    "viewName": "ReptCustDispDet"
+                },
+                "TargetReptCustRecon": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ReptCustRecon",
+                    "viewName": "ReptCustRecon"
+                },
+                "TargetReptCustValCon": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ReptCustValCon",
+                    "viewName": "ReptCustValCon"
+                },
+                "TargetReptCustClosBal": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ReptCustClosBal",
+                    "viewName": "ReptCustClosBal"
+                },
+                "TargetReptCustPayDet": {
+                    "viewType": "XML",
+                    "transition": "slide",
+                    "clearControlAggregation": false,
+                    "viewId": "ReptCustPayDet",
+                    "viewName": "ReptCustPayDet"
+                }
+            }
+        },
+        "rootView": {
+            "viewName": "customerindent.view.App",
+            "type": "XML",
+            "async": true,
+            "id": "App"
+        }
+    }
+}

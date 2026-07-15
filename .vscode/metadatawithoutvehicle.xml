@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+  <edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+- <edmx:DataServices m:DataServiceVersion="2.0">
+- <Schema Namespace="ZSD_CUST_IND_NOVEH_SRV" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+- <EntityType Name="GetOpenIndents" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="KUNNR" /> 
+  <PropertyRef Name="ORDER_NO" /> 
+  </Key>
+  <Property Name="KUNNR" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Customer" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="NAME1" Type="Edm.String" MaxLength="35" sap:unicode="false" sap:label="Customer Name" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="DATE_FROM" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Start Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="WERKS" Type="Edm.String" MaxLength="4" sap:unicode="false" sap:label="Plant" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="TRANS_GSTID" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="Transporter GSTIN" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="TRANS_TEXT" Type="Edm.String" MaxLength="80" sap:unicode="false" sap:label="Transporter GSTIN Text" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ORDER_ID" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Order No." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ORDER_NO" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Order Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="BEGDA" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Order Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="KUNNR_DESC" Type="Edm.String" MaxLength="30" sap:unicode="false" sap:label="Customer" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="MATNR1" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="Material 1" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="QUANTITY1" Type="Edm.String" MaxLength="17" sap:unicode="false" sap:label="Quantity 1" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="MATNR2" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="Material 2" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="QUANTITY2" Type="Edm.String" MaxLength="17" sap:unicode="false" sap:label="Quantity 2" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CONTRACT1" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="Sales Contract" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="BL_QTY1" Type="Edm.String" MaxLength="17" sap:unicode="false" sap:label="Balance Material 1" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="BL_QTY2" Type="Edm.String" MaxLength="17" sap:unicode="false" sap:label="Balance Material 2" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="TPT_GSTN" Type="Edm.String" MaxLength="100" sap:unicode="false" sap:label="Transporter with GSTIN" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ERROR" Type="Edm.String" MaxLength="200" sap:unicode="false" sap:label="Message" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ROW_TYPE" Type="Edm.String" MaxLength="1" sap:unicode="false" sap:label="Row Type" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CUST_USER_ID" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="User ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:label="Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  </EntityType>
+- <EntityType Name="GetCustomer" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="KUNNR" /> 
+  </Key>
+  <Property Name="KUNNR" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Customer" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="KUNNR_DESC" Type="Edm.String" MaxLength="30" sap:unicode="false" sap:label="Customer description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CUST_USER_ID" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="User ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:label="Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  </EntityType>
+- <EntityType Name="GetTransGSTIN" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="TPT_GSTN" /> 
+  </Key>
+  <Property Name="TPT_GSTN" Type="Edm.String" Nullable="false" MaxLength="100" sap:unicode="false" sap:label="Transporter GSTIN" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CUST_USER_ID" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="User ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:label="Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="NAME" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  </EntityType>
+- <EntityType Name="GetOrderId" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="ORDER_NO" /> 
+  </Key>
+  <Property Name="ORDER_NO" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Order No." sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="KUNNR" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Customer" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="MATNR1" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="Material 1" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="MATNR2" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="Material 2" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="VSBED" Type="Edm.String" MaxLength="20" sap:unicode="false" sap:label="Indent Mode" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CUST_USER_ID" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="User ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:label="Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  </EntityType>
+- <EntityType Name="Material" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="KUNNR" /> 
+  <PropertyRef Name="MATNR" /> 
+  </Key>
+  <Property Name="KUNNR" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Customer" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="MATNR" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Material" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="MATDESC" Type="Edm.String" Nullable="false" MaxLength="100" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="MATNR1" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="Material 1" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ACTIVE1" Type="Edm.String" MaxLength="1" sap:unicode="false" sap:label="Activate Material1" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="MATNR2" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="Material 2" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ACTIVE2" Type="Edm.String" MaxLength="1" sap:unicode="false" sap:label="Activate Material1" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CUST_USER_ID" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="User ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:label="Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  </EntityType>
+- <EntityContainer Name="ZSD_CUST_IND_NOVEH_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+  <EntitySet Name="GetOpenIndentsSet" EntityType="ZSD_CUST_IND_NOVEH_SRV.GetOpenIndents" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  <EntitySet Name="GetCustomerSet" EntityType="ZSD_CUST_IND_NOVEH_SRV.GetCustomer" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  <EntitySet Name="GetTransGSTINSet" EntityType="ZSD_CUST_IND_NOVEH_SRV.GetTransGSTIN" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  <EntitySet Name="GetOrderIdSet" EntityType="ZSD_CUST_IND_NOVEH_SRV.GetOrderId" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  <EntitySet Name="MaterialSet" EntityType="ZSD_CUST_IND_NOVEH_SRV.Material" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  </EntityContainer>
+  <atom:link rel="self" href="http://eccdev.nrl.com:8000/sap/opu/odata/SAP/ZSD_CUST_IND_NOVEH_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom" /> 
+  <atom:link rel="latest-version" href="http://eccdev.nrl.com:8000/sap/opu/odata/SAP/ZSD_CUST_IND_NOVEH_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom" /> 
+  </Schema>
+  </edmx:DataServices>
+  </edmx:Edmx>

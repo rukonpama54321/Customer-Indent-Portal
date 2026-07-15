@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+ <edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+- <edmx:DataServices m:DataServiceVersion="2.0">
+- <Schema Namespace="ZSD_CUST_IND_INBND_SRV" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+- <EntityType Name="Material" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="MATNR" /> 
+  </Key>
+  <Property Name="MATNR" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Material" sap:creatable="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="MAKTX" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:label="Description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CUST_USER_ID" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="User ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  </EntityType>
+- <EntityType Name="Stock" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="MATNR" /> 
+  </Key>
+  <Property Name="MATNR" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:label="Material" sap:creatable="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="UNLD_STOCK" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Tank Stock(KL)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="UNLD_STOCK15" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Tank Stock(KL15)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="UNLD_STOCKMT" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Tank Stock(MT)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="LN_HLD_KL" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Line Hold(KL)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="LN_HLD_KL15" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Line Hold(KL15)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="LN_HLD_MT" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Line Hold(MT)" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="OPEN_INDT" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Open Indent Qty" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="BAL_QTY" Type="Edm.String" MaxLength="25" sap:unicode="false" sap:label="Avaliable Qty" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CUST_USER_ID" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:label="User ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:label="Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" /> 
+  </EntityType>
+- <EntityType Name="InboundIndent" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="IND_VEH" /> 
+  <PropertyRef Name="IND_DATE" /> 
+  <PropertyRef Name="IND_MATNR" /> 
+  </Key>
+  <Property Name="IND_VEH" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="IND_DATE" Type="Edm.String" Nullable="false" MaxLength="8" sap:unicode="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="IND_MATNR" Type="Edm.String" Nullable="false" MaxLength="40" sap:unicode="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="IND_QTY" Type="Edm.String" MaxLength="15" sap:unicode="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="IND_QTY15" Type="Edm.String" MaxLength="15" sap:unicode="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="IND_QTYMT" Type="Edm.String" MaxLength="15" sap:unicode="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="IND_INV" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="IND_PLANT" Type="Edm.String" MaxLength="4" sap:unicode="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="IND_CUST" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ZSTATUS" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="DATE_FROM" Type="Edm.String" MaxLength="8" sap:unicode="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="DATE_TO" Type="Edm.String" MaxLength="8" sap:unicode="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="ALL_FLAG" Type="Edm.String" MaxLength="1" sap:unicode="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CUST_USER_ID" Type="Edm.String" MaxLength="12" sap:unicode="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:updatable="false" sap:sortable="false" /> 
+  </EntityType>
+- <EntityType Name="InboundInit" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="CUST_USER_ID" /> 
+  </Key>
+  <Property Name="CUST_USER_ID" Type="Edm.String" Nullable="false" MaxLength="12" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" /> 
+  <Property Name="MATNR" Type="Edm.String" MaxLength="40" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="KUNNR" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="DEPOT" Type="Edm.String" MaxLength="4" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="EBMS" Type="Edm.String" MaxLength="1" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" /> 
+  </EntityType>
+- <EntityContainer Name="ZSD_CUST_IND_INBND_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+  <EntitySet Name="MaterialSet" EntityType="ZSD_CUST_IND_INBND_SRV.Material" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  <EntitySet Name="StockSet" EntityType="ZSD_CUST_IND_INBND_SRV.Stock" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  <EntitySet Name="InboundIndentSet" EntityType="ZSD_CUST_IND_INBND_SRV.InboundIndent" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  <EntitySet Name="InboundInitSet" EntityType="ZSD_CUST_IND_INBND_SRV.InboundInit" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  </EntityContainer>
+  <atom:link rel="self" href="http://eccdev.nrl.com:8000/sap/opu/odata/SAP/ZSD_CUST_IND_INBND_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom" /> 
+  <atom:link rel="latest-version" href="http://eccdev.nrl.com:8000/sap/opu/odata/SAP/ZSD_CUST_IND_INBND_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom" /> 
+  </Schema>
+  </edmx:DataServices>
+  </edmx:Edmx>

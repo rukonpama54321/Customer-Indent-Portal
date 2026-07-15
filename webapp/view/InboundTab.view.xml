@@ -1,0 +1,184 @@
+<mvc:View
+    controllerName="customerindent.controller.InboundTab"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    displayBlock="true">
+
+    <VBox class="ciPage sapUiSmallPadding">
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 1 — STOCK OVERVIEW
+        ═══════════════════════════════════════════ -->
+        <VBox class="ciCard">
+            <HBox class="ciCardHeader" justifyContent="SpaceBetween" alignItems="Center">
+                <Text text="Stock Overview" class="sapUiSmallMarginBegin"/>
+                <Button text="Show Stock"
+                        type="Emphasized"
+                        icon="sap-icon://refresh"
+                        press=".onShowStock"
+                        class="sapUiSmallMarginEnd"/>
+            </HBox>
+            <VBox class="ciCardBody">
+                <layout:Grid defaultSpan="L3 M6 S12" hSpacing="1" vSpacing="0">
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Tank Stock (KL)" class="sapUiTinyMarginBottom"/>
+                        <Input value="{inbStock>/UNLD_STOCK}" editable="false" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Tank Stock (KL @15°)" class="sapUiTinyMarginBottom"/>
+                        <Input value="{inbStock>/UNLD_STOCK15}" editable="false" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Tank Stock (MT)" class="sapUiTinyMarginBottom"/>
+                        <Input value="{inbStock>/UNLD_STOCKMT}" editable="false" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Open Indent Qty" class="sapUiTinyMarginBottom"/>
+                        <Input value="{inbStock>/OPEN_INDT}" editable="false" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Line Hold Stock (KL)" class="sapUiTinyMarginBottom"/>
+                        <Input value="{inbStock>/LN_HLD_KL}" editable="false" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Line Hold Stock (KL @15°)" class="sapUiTinyMarginBottom"/>
+                        <Input value="{inbStock>/LN_HLD_KL15}" editable="false" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Line Hold Stock (MT)" class="sapUiTinyMarginBottom"/>
+                        <Input value="{inbStock>/LN_HLD_MT}" editable="false" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Available Qty for Load" class="sapUiTinyMarginBottom"/>
+                        <Input value="{inbStock>/BAL_QTY}" editable="false" width="100%"/>
+                    </VBox>
+                </layout:Grid>
+            </VBox>
+        </VBox>
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 2 — NEW INBOUND INDENT
+        ═══════════════════════════════════════════ -->
+        <VBox class="ciCard">
+            <HBox class="ciCardHeader" justifyContent="SpaceBetween" alignItems="Center">
+                <Text text="New Inbound Indent" class="sapUiSmallMarginBegin"/>
+                <Button text="Save"
+                        type="Emphasized"
+                        icon="sap-icon://save"
+                        press=".onSave"
+                        class="sapUiSmallMarginEnd"/>
+            </HBox>
+            <VBox class="ciCardBody">
+                <layout:Grid defaultSpan="L4 M6 S12" hSpacing="1" vSpacing="0">
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Material" labelFor="inbMaterial"
+                               class="sapUiTinyMarginBottom"/>
+                        <!-- Material is system-assigned (ZEBMS_BLEND-IMAT2, EBMS customers
+                             only) - single value per customer, not a user choice.
+                             Read-only, mirrors the WebDynpro inbound tab. -->
+                        <Input id="inbMaterial"
+                               value="{inbForm>/MATNR}"
+                               editable="false"
+                               width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Quantity (KL)" required="true" labelFor="inbQtyKL"
+                               class="sapUiTinyMarginBottom"/>
+                        <Input id="inbQtyKL" type="Number" value="{inbForm>/QTY_KL}"
+                               placeholder="0.000" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Quantity (KL @15°)" class="sapUiTinyMarginBottom"/>
+                        <Input type="Number" value="{inbForm>/QTY_KL15}"
+                               placeholder="0.000" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Quantity (MT)" class="sapUiTinyMarginBottom"/>
+                        <Input type="Number" value="{inbForm>/QTY_MT}"
+                               placeholder="0.000" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="TT Number" required="true" labelFor="inbTT"
+                               class="sapUiTinyMarginBottom"/>
+                        <Input id="inbTT" value="{inbForm>/TT_NUMBER}"
+                               placeholder="Enter TT number" maxLength="10" width="100%"/>
+                    </VBox>
+                    <VBox class="sapUiSmallMarginBottom">
+                        <Label text="Invoice No" class="sapUiTinyMarginBottom"/>
+                        <Input value="{inbForm>/INVOICE_NO}"
+                               placeholder="Enter invoice no." maxLength="10" width="100%"/>
+                    </VBox>
+                </layout:Grid>
+            </VBox>
+        </VBox>
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 3 — INBOUND INDENTS
+        ═══════════════════════════════════════════ -->
+        <VBox class="ciCard">
+            <HBox class="ciCardHeader" alignItems="Center">
+                <Text text="Inbound Indents" class="sapUiSmallMarginBeginEnd"/>
+            </HBox>
+
+            <!-- Filter bar -->
+            <HBox wrap="Wrap" alignItems="Center"
+                  class="sapUiSmallPaddingBeginEnd sapUiSmallPaddingTop sapUiSmallPaddingBottom">
+                <DatePicker id="inbDateFrom" value="{inbForm>/DATE_FROM}"
+                            valueFormat="yyyyMMdd" displayFormat="dd.MM.yyyy"
+                            placeholder="From Date" width="9rem"/>
+                <DatePicker id="inbDateTo" value="{inbForm>/DATE_TO}"
+                            valueFormat="yyyyMMdd" displayFormat="dd.MM.yyyy"
+                            placeholder="To Date" width="9rem"
+                            class="sapUiSmallMarginBegin"/>
+                <Button text="Open Inbound Indents" type="Emphasized" icon="sap-icon://search"
+                        press=".onOpenIndents" class="sapUiSmallMarginBegin"/>
+                <Button text="All Indents" icon="sap-icon://list"
+                        press=".onAllIndents" class="sapUiSmallMarginBegin"/>
+                <Button text="Modify Indent" icon="sap-icon://edit"
+                        press=".onModifyIndent" class="sapUiSmallMarginBegin"/>
+            </HBox>
+
+            <!-- Table — full-width so it fills and centers within the card;
+                 columns use proportional widths under fixedLayout. The
+                 ScrollContainer keeps a horizontal scrollbar on narrow viewports. -->
+            <ScrollContainer height="auto" width="100%" horizontal="true" vertical="false">
+                <Table id="inbIndentTable"
+                       items="{inbTable>/results}"
+                       sticky="ColumnHeaders"
+                       alternateRowColors="true"
+                       fixedLayout="true"
+                       width="100%"
+                       mode="SingleSelectLeft"
+                       noDataText="No inbound indents found. Use the filters and press a search button.">
+                    <columns>
+                        <Column width="12%"><Text text="Date"/></Column>
+                        <Column width="22%"><Text text="Material"/></Column>
+                        <Column width="14%"><Text text="Vehicle Number"/></Column>
+                        <Column width="12%" hAlign="End"><Text text="Quantity (KL)"/></Column>
+                        <Column width="12%" hAlign="End"><Text text="Quantity (KL @15°)"/></Column>
+                        <Column width="11%" hAlign="End"><Text text="Quantity (MT)"/></Column>
+                        <Column width="11%"><Text text="Invoice Number"/></Column>
+                        <Column width="6%"><Text text="Status"/></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem vAlign="Middle">
+                            <cells>
+                                <Text text="{inbTable>IND_DATE}"   wrapping="false"/>
+                                <Text text="{inbTable>IND_MATNR}"  wrapping="false"/>
+                                <Text text="{inbTable>IND_VEH}"    wrapping="false"/>
+                                <Text text="{inbTable>IND_QTY}"    wrapping="false"/>
+                                <Text text="{inbTable>IND_QTY15}"  wrapping="false"/>
+                                <Text text="{inbTable>IND_QTYMT}"  wrapping="false"/>
+                                <Text text="{inbTable>IND_INV}"    wrapping="false"/>
+                                <Text text="{inbTable>ZSTATUS}"    wrapping="false"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </ScrollContainer>
+        </VBox>
+
+    </VBox>
+</mvc:View>

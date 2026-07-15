@@ -1,0 +1,8 @@
+<mvc:View controllerName="customerindent.controller.CustomerIndent"
+    xmlns:mvc="sap.ui.core.mvc" displayBlock="true"
+    xmlns="sap.m"><Page showHeader="false"><content><VBox width="100%" class="ciMast"><HBox alignItems="Center" wrap="Wrap"><Image src="img/logo.png" alt="NRL" class="ciMastLogo sapUiTinyMarginEnd"/><VBox><Title text="Customer Indent Portal" level="H1" class="ciMastTitle"/><Text text="Place and manage your sales indents" class="ciMastSubtitle"/></VBox></HBox></VBox><VBox class="sapUiResponsiveMargin" alignItems="Start"><FlexBox
+          class="sapUiSmallMarginTopBottom"
+          direction="Row"
+          wrap="Wrap"
+          justifyContent="Start"
+          alignItems="Stretch"><VBox width="250px" class="sapUiTinyMarginEnd sapUiTinyMarginBottom"><GenericTile header="Indent Placement for OMCs" subheader="Create Indent" press="onPressEntry"><tileContent><TileContent><content><ImageContent src="sap-icon://add"/></content></TileContent></tileContent></GenericTile></VBox><VBox width="250px" class="sapUiTinyMarginBottom"><GenericTile header="Reports" subheader="View Customer Reports" press="onPressReports"><tileContent><TileContent id="tileContentReports" ><content><ImageContent src="sap-icon://display"/></content></TileContent></tileContent></GenericTile></VBox><VBox width="250px" class="sapUiTinyMarginBottom"><GenericTile header="Bulk Indent" subheader="Manage Bulk Indents" press="onPressBulk"><tileContent><TileContent><content><ImageContent src="sap-icon://shipping-status"/></content></TileContent></tileContent></GenericTile></VBox></FlexBox></VBox></content></Page></mvc:View>

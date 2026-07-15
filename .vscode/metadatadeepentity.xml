@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+  <edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+- <edmx:DataServices m:DataServiceVersion="2.0">
+- <Schema Namespace="ZSD_CUST_PORTAL_DEEPENTITY_SRV" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+- <EntityType Name="ZCREATE" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="CUST_USER_ID" /> 
+  </Key>
+  <Property Name="CUST_USER_ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Customer User Id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="Mail ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <NavigationProperty Name="HDR_TO_ITEM_NAV" Relationship="ZSD_CUST_PORTAL_DEEPENTITY_SRV.HDR_TO_ITEM" FromRole="FromRole_HDR_TO_ITEM" ToRole="ToRole_HDR_TO_ITEM" /> 
+  </EntityType>
+- <EntityType Name="ZCREATEItems" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="DEPOT" /> 
+  <PropertyRef Name="KUNNR" /> 
+  <PropertyRef Name="BEGDA" /> 
+  <PropertyRef Name="VEHICLE" /> 
+  <PropertyRef Name="CUST_USER_ID" /> 
+  </Key>
+  <Property Name="DEPOT" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="KUNNR" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="BEGDA" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Start Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="VEHICLE" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Vehicle Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CUST_USER_ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Customer User Id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ZTT_STATUS" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Status" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ZTT_STATUS_DESC" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Status Desc" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  </EntityType>
+- <EntityType Name="ZDELETE" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="CUST_USER_ID" /> 
+  </Key>
+  <Property Name="CUST_USER_ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Customer User Id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="SMTP_ADDR" Type="Edm.String" Nullable="false" MaxLength="241" sap:unicode="false" sap:label="Mail ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <NavigationProperty Name="HDR_TO_ITEM_DEL_NAV" Relationship="ZSD_CUST_PORTAL_DEEPENTITY_SRV.HDR_TO_ITEM_DEL" FromRole="FromRole_HDR_TO_ITEM_DEL" ToRole="ToRole_HDR_TO_ITEM_DEL" /> 
+  </EntityType>
+- <EntityType Name="ZDELETEItems" sap:content-version="1">
+- <Key>
+  <PropertyRef Name="DEPOT" /> 
+  <PropertyRef Name="KUNNR" /> 
+  <PropertyRef Name="BEGDA" /> 
+  <PropertyRef Name="VEHICLE" /> 
+  <PropertyRef Name="CUST_USER_ID" /> 
+  </Key>
+  <Property Name="DEPOT" Type="Edm.String" Nullable="false" MaxLength="4" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="KUNNR" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="BEGDA" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="Start Date" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="VEHICLE" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Vehicle Number" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="CUST_USER_ID" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Customer User Id" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ZTT_STATUS" Type="Edm.String" Nullable="false" MaxLength="1" sap:unicode="false" sap:label="Status" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="ZTT_STATUS_DESC" Type="Edm.String" Nullable="false" MaxLength="50" sap:unicode="false" sap:label="Status Desc" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  </EntityType>
+- <Association Name="HDR_TO_ITEM_DEL" sap:content-version="1">
+  <End Type="ZSD_CUST_PORTAL_DEEPENTITY_SRV.ZDELETE" Multiplicity="1" Role="FromRole_HDR_TO_ITEM_DEL" /> 
+  <End Type="ZSD_CUST_PORTAL_DEEPENTITY_SRV.ZDELETEItems" Multiplicity="*" Role="ToRole_HDR_TO_ITEM_DEL" /> 
+- <ReferentialConstraint>
+- <Principal Role="FromRole_HDR_TO_ITEM_DEL">
+  <PropertyRef Name="CUST_USER_ID" /> 
+  </Principal>
+- <Dependent Role="ToRole_HDR_TO_ITEM_DEL">
+  <PropertyRef Name="CUST_USER_ID" /> 
+  </Dependent>
+  </ReferentialConstraint>
+  </Association>
+- <Association Name="HDR_TO_ITEM" sap:content-version="1">
+  <End Type="ZSD_CUST_PORTAL_DEEPENTITY_SRV.ZCREATE" Multiplicity="1" Role="FromRole_HDR_TO_ITEM" /> 
+  <End Type="ZSD_CUST_PORTAL_DEEPENTITY_SRV.ZCREATEItems" Multiplicity="*" Role="ToRole_HDR_TO_ITEM" /> 
+- <ReferentialConstraint>
+- <Principal Role="FromRole_HDR_TO_ITEM">
+  <PropertyRef Name="CUST_USER_ID" /> 
+  </Principal>
+- <Dependent Role="ToRole_HDR_TO_ITEM">
+  <PropertyRef Name="CUST_USER_ID" /> 
+  </Dependent>
+  </ReferentialConstraint>
+  </Association>
+- <EntityContainer Name="ZSD_CUST_PORTAL_DEEPENTITY_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+  <EntitySet Name="ZCREATESet" EntityType="ZSD_CUST_PORTAL_DEEPENTITY_SRV.ZCREATE" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  <EntitySet Name="ZCREATEItemsSet" EntityType="ZSD_CUST_PORTAL_DEEPENTITY_SRV.ZCREATEItems" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  <EntitySet Name="ZDELETESet" EntityType="ZSD_CUST_PORTAL_DEEPENTITY_SRV.ZDELETE" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+  <EntitySet Name="ZDELETEItemsSet" EntityType="ZSD_CUST_PORTAL_DEEPENTITY_SRV.ZDELETEItems" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1" /> 
+- <AssociationSet Name="HDR_TO_ITEMSet" Association="ZSD_CUST_PORTAL_DEEPENTITY_SRV.HDR_TO_ITEM" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+  <End EntitySet="ZCREATESet" Role="FromRole_HDR_TO_ITEM" /> 
+  <End EntitySet="ZCREATEItemsSet" Role="ToRole_HDR_TO_ITEM" /> 
+  </AssociationSet>
+- <AssociationSet Name="HDR_TO_ITEM_DELSet" Association="ZSD_CUST_PORTAL_DEEPENTITY_SRV.HDR_TO_ITEM_DEL" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:content-version="1">
+  <End EntitySet="ZDELETESet" Role="FromRole_HDR_TO_ITEM_DEL" /> 
+  <End EntitySet="ZDELETEItemsSet" Role="ToRole_HDR_TO_ITEM_DEL" /> 
+  </AssociationSet>
+  </EntityContainer>
+  <atom:link rel="self" href="http://eccdev.nrl.com:8000/sap/opu/odata/SAP/ZSD_CUST_PORTAL_DEEPENTITY_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom" /> 
+  <atom:link rel="latest-version" href="http://eccdev.nrl.com:8000/sap/opu/odata/SAP/ZSD_CUST_PORTAL_DEEPENTITY_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom" /> 
+  </Schema>
+  </edmx:DataServices>
+  </edmx:Edmx>

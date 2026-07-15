@@ -1,0 +1,272 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.app{padding:12px;font-size:12px;color:var(--color-text-primary)}
+.tabs{display:flex;gap:0;border-bottom:1.5px solid var(--color-border-primary);margin-bottom:12px}
+.tab{padding:6px 16px;font-size:12px;cursor:pointer;border:0.5px solid var(--color-border-tertiary);border-bottom:none;background:var(--color-background-secondary);color:var(--color-text-secondary);border-radius:4px 4px 0 0}
+.tab.active{background:var(--color-background-primary);color:var(--color-text-primary);font-weight:500;border-bottom:1.5px solid var(--color-background-primary);margin-bottom:-1.5px}
+.page-title{font-size:13px;font-weight:500;margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.field{display:flex;flex-direction:column;gap:2px}
+.field label{font-size:10px;color:var(--color-text-secondary)}
+.req{color:var(--color-text-danger)}
+.input-mock{height:22px;border:0.5px solid var(--color-border-secondary);border-radius:3px;background:var(--color-background-primary)}
+.binding{font-size:8px;color:var(--color-text-info);background:var(--color-background-info);padding:2px 4px;border-radius:3px;border:0.5px solid var(--color-border-info);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-grid{display:grid;grid-template-columns:220px 220px 180px 160px 180px 1fr;gap:8px;margin-bottom:10px}
+.field-with-btn{display:flex;gap:4px;align-items:flex-end}
+.field-with-btn .field{flex:1}
+.icon-btn{height:22px;width:22px;border:0.5px solid var(--color-border-secondary);border-radius:3px;background:var(--color-background-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.action-tag{font-size:7px;background:var(--color-background-warning);color:var(--color-text-warning);border:0.5px solid var(--color-border-warning);padding:1px 4px;border-radius:3px;white-space:nowrap}
+.method-tag{font-size:7px;background:var(--color-background-success);color:var(--color-text-success);border:0.5px solid var(--color-border-success);padding:1px 4px;border-radius:3px;white-space:nowrap}
+.section-title{font-size:10px;font-weight:500;color:var(--color-text-secondary);margin:8px 0 5px;text-transform:uppercase;letter-spacing:0.04em}
+.comp-scroll{overflow-x:auto;margin-bottom:8px}
+.comp-table{border-collapse:collapse;width:max-content}
+.comp-table td{border:0.5px solid var(--color-border-tertiary);padding:4px 8px;vertical-align:top;min-width:140px}
+.comp-table .comp-header{background:var(--color-background-secondary);font-size:9px;font-weight:500;text-align:center;padding:3px 8px}
+.comp-table .row-label{font-size:10px;color:var(--color-text-secondary);background:var(--color-background-secondary);font-weight:500;white-space:nowrap;padding:4px 8px;min-width:120px}
+.flush-row{display:grid;grid-template-columns:200px 200px 1fr;gap:8px;margin-bottom:10px;align-items:end}
+.btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.btn-block{display:flex;flex-direction:column;gap:2px}
+.btn{padding:4px 10px;font-size:10px;border:0.5px solid var(--color-border-secondary);border-radius:3px;background:var(--color-background-secondary);cursor:pointer;color:var(--color-text-primary)}
+.btn.danger{border-color:var(--color-border-danger);color:var(--color-text-danger)}
+.btn.primary{border-color:var(--color-border-info);color:var(--color-text-info)}
+.filter-row{display:flex;gap:12px;align-items:flex-end;padding:6px 8px;background:var(--color-background-secondary);border-radius:4px;border:0.5px solid var(--color-border-tertiary);margin-bottom:8px;flex-wrap:wrap}
+.filter-item{display:flex;flex-direction:column;gap:2px;min-width:200px}
+.filter-item label{font-size:10px;color:var(--color-text-secondary)}
+.table-outer{border:0.5px solid var(--color-border-tertiary);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.table-scroll{overflow-x:auto}
+.prefix{font-size:7px;color:var(--color-text-secondary);display:block}
+.field-name{font-size:8px;color:var(--color-text-info);display:block;font-weight:500}
+table.main{border-collapse:collapse;width:max-content}
+table.main th{background:var(--color-background-secondary);padding:4px 8px;border:0.5px solid var(--color-border-tertiary);font-weight:500;text-align:left;white-space:nowrap;font-size:9px;vertical-align:top;line-height:1.4}
+table.main td{padding:4px 8px;border:0.5px solid var(--color-border-tertiary);font-size:9px;color:var(--color-text-secondary);white-space:nowrap}
+.hint{font-size:9px;color:var(--color-text-tertiary);margin-bottom:4px}
+.tags{display:flex;gap:3px;margin-top:2px;flex-wrap:wrap}
+</style>
+
+<div class="app">
+  <div class="tabs">
+    <div class="tab active">With Vehicle</div>
+    <div class="tab">Without Vehicle</div>
+    <div class="tab">Inbound</div>
+  </div>
+
+  <div class="page-title">Indent Portal</div>
+
+  <div class="header-grid">
+    <div>
+      <div class="field-with-btn">
+        <div class="field">
+          <label>Loading Date <span class="req">*</span></label>
+          <div class="input-mock"></div>
+          <div class="binding">INDMAIN.HEADER_DATA.LOAD_DATE</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div class="icon-btn"><i class="ti ti-calendar" style="font-size:12px" aria-hidden="true"></i></div>
+          <div class="icon-btn"><i class="ti ti-search" style="font-size:12px" aria-hidden="true"></i></div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="action-tag">ACTION: GET_INDENTS</span>
+        <span class="method-tag">ONACTION_GET_INDENTS</span>
+      </div>
+    </div>
+    <div>
+      <div class="field-with-btn">
+        <div class="field">
+          <label>Vehicle <span class="req">*</span></label>
+          <div class="input-mock"></div>
+          <div class="binding">INDMAIN.IMPORTING.VEHICLE</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <div class="icon-btn"><i class="ti ti-search" style="font-size:12px" aria-hidden="true"></i></div>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="action-tag">ACTION: GET_VEHICLE</span>
+        <span class="method-tag">ONACTIONGET_VEHICLE</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Customer <span class="req">*</span></label>
+      <div class="input-mock"></div>
+      <div class="binding">INDMAIN.HEADER_DATA.NAME1</div>
+    </div>
+    <div class="field">
+      <label>Sales Contract</label>
+      <div class="input-mock"></div>
+      <div class="binding">INDMAIN.EXPORT.VBELN</div>
+    </div>
+    <div class="field">
+      <label>Transporter GSTN</label>
+      <div class="input-mock"></div>
+      <div class="binding">INDMAIN.GSTN.TPT_GSTN</div>
+    </div>
+    <div class="field">
+      <label>End Use</label>
+      <div class="input-mock"></div>
+      <div class="binding">INDMAIN.IND_CAT.IND_CATEGORY</div>
+    </div>
+  </div>
+
+  <div class="section-title">Compartment Details</div>
+  <div class="comp-scroll">
+    <table class="comp-table">
+      <thead>
+        <tr>
+          <td class="comp-header"></td>
+          <td class="comp-header">COMP1</td>
+          <td class="comp-header">COMP2</td>
+          <td class="comp-header">COMP3</td>
+          <td class="comp-header">COMP4</td>
+          <td class="comp-header">COMP5</td>
+          <td class="comp-header">COMP6</td>
+          <td class="comp-header">COMP7</td>
+          <td class="comp-header">COMP8</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="row-label">Enter Products <span class="req">*</span></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.PROD1.PRODUCT</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.PROD2.PRODUCT</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.PROD3.PRODUCT</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.PROD4.PRODUCT</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.PROD5.PRODUCT</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.PROD6.PRODUCT</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.PROD7.PRODUCT</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.PROD8.PRODUCT</div></td>
+        </tr>
+        <tr>
+          <td class="row-label">Enter Qty in KG <span class="req">*</span></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.EXPORTING.CAPACITY1</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.EXPORTING.CAPACITY2</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.EXPORTING.CAPACITY3</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.EXPORTING.CAPACITY4</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.EXPORTING.CAPACITY5</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.EXPORTING.CAPACITY6</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.EXPORTING.CAPACITY7</div></td>
+          <td><div class="input-mock"></div><div class="binding">INDMAIN.EXPORTING.CAPACITY8</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flush-row">
+    <div class="field">
+      <label>Flushing reqd (ATF)</label>
+      <div class="input-mock"></div>
+      <div class="binding">INDMAIN.ATF_FLUSH.DESC</div>
+    </div>
+    <div class="field">
+      <label>Flushing Reason</label>
+      <div class="input-mock"></div>
+      <div class="binding">INDMAIN.FLUSH_REASON.FLSH_REASON</div>
+    </div>
+    <div></div>
+  </div>
+
+  <div class="btn-row">
+    <div class="btn-block">
+      <button class="btn primary">Save Indent</button>
+      <div class="tags">
+        <span class="action-tag">ACTION: SAVE_INDENT</span>
+        <span class="method-tag">ONACTION_SAVE_INDENT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <div class="filter-item">
+      <label>Filter: Vehicle</label>
+      <div class="input-mock" style="width:200px"></div>
+      <div class="binding">INDMAIN.Z_GET_CUSTOMER_INDEN.IMPORTING_1.VEHICLE</div>
+    </div>
+    <div class="filter-item">
+      <label>Indent Mode</label>
+      <div class="input-mock" style="width:180px"></div>
+      <div class="binding">INDMAIN.IND_MODE.IND_TYPE</div>
+    </div>
+    <div class="filter-item">
+      <label>Delete Indicator</label>
+      <div class="input-mock" style="width:180px"></div>
+      <div class="binding">INDMAIN.IND_DEL.DEL_IND</div>
+    </div>
+  </div>
+
+  <div class="hint"><i class="ti ti-arrows-horizontal" aria-hidden="true"></i> scroll horizontally to see all table columns</div>
+  <div class="table-outer">
+    <div class="table-scroll">
+      <table class="main">
+        <thead>
+          <tr>
+            <th style="width:28px"></th>
+            <th>Vehicle<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">VEHICLE</span></th>
+            <th>Customer<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">KUNNR</span></th>
+            <th>Product (C1)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">PROD_CMP1</span></th>
+            <th>Qty (C1)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">QUAN_COMP1</span></th>
+            <th>Product (C2)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">PROD_CMP2</span></th>
+            <th>Qty (C2)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">QUAN_COMP2</span></th>
+            <th>Product (C3)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">PROD_CMP3</span></th>
+            <th>Qty (C3)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">QUAN_COMP3</span></th>
+            <th>Product (C4)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">PROD_CMP4</span></th>
+            <th>Qty (C4)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">QUAN_COMP4</span></th>
+            <th>Product (C5)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">PROD_CMP5</span></th>
+            <th>Qty (C5)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">QUAN_COMP5</span></th>
+            <th>Product (C6)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">PROD_CMP6</span></th>
+            <th>Qty (C6)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">QUAN_COMP6</span></th>
+            <th>Product (C7)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">PROD_CMP7</span></th>
+            <th>Qty (C7)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">QUAN_COMP7</span></th>
+            <th>Product (C8)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">PROD_CMP8</span></th>
+            <th>Qty (C8)<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">QUAN_COMP8</span></th>
+            <th>Flushing<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">ATF_FLUSH</span></th>
+            <th>Indent Status<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">ZTT_STATUS_DESC</span></th>
+            <th>Sales Contract<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">CONTRACT</span></th>
+            <th>Transporter Name<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">TPT_GSTN</span></th>
+            <th>Message<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">ERROR</span></th>
+            <th>Deletion Allowed<span class="prefix">INDMAIN.Z_GET_CUSTOMER_INDEN.CHANGING_1.ITAB_INDENT.</span><span class="field-name">ZDELETE</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <div class="btn-block">
+      <button class="btn danger">Delete Indent</button>
+      <div class="tags">
+        <span class="action-tag">ACTION: DELETE_INDENT</span>
+        <span class="method-tag">ONACTION_DELETE_INDENT</span>
+      </div>
+    </div>
+    <div class="btn-block">
+      <button class="btn primary">Submit Selected Indents</button>
+      <div class="tags">
+        <span class="action-tag">ACTION: SUBMIT_INDENT</span>
+        <span class="method-tag">ONACTIONSUBMIT_INDENT</span>
+      </div>
+    </div>
+    <div class="btn-block">
+      <button class="btn primary">Submit All Indents</button>
+      <div class="tags">
+        <span class="action-tag">ACTION: SUBMIT_INDENT_ALL</span>
+        <span class="method-tag">ONACTIONSUBMIT_INDENT_ALL</span>
+      </div>
+    </div>
+    <div class="btn-block">
+      <button class="btn">Change Indent</button>
+      <div class="tags">
+        <span class="action-tag">ACTION: MODIFY_INDENT</span>
+        <span class="method-tag">ONACTION_MODIFY_INDENT</span>
+      </div>
+    </div>
+  </div>
+</div>

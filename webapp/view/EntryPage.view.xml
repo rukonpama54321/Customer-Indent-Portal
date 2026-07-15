@@ -1,0 +1,9 @@
+
+<mvc:View 
+    controllerName="customerindent.controller.EntryPage"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form"
+    displayBlock="true"><Page id="entryPage" showHeader="false"><content><VBox width="100%"><VBox class="ciMast"><HBox justifyContent="SpaceBetween" alignItems="Center" wrap="Wrap"><HBox alignItems="Center" wrap="Wrap"><Button icon="sap-icon://nav-back" type="Transparent" tooltip="Back to Customer Portal" class="ciMastBackBtn sapUiTinyMarginEnd" press=".onNavBack"/><Image src="img/logo.png" alt="NRL" class="ciMastLogo sapUiTinyMarginEnd"/><VBox><Title text="Customer Indent Portal" level="H1" class="ciMastTitle"/><Text text="Place and manage your sales indents" class="ciMastSubtitle"/></VBox></HBox></HBox></VBox><IconTabBar id="entryTabs" class="sapUiResponsiveContentPadding" select=".onTabSelect"><items><IconTabFilter id="tabWithVehicle" text="With Vehicle" key="withVehicletab" icon="sap-icon://shipping-status"><mvc:XMLView viewName="customerindent.view.WithVehicleTab"/></IconTabFilter><IconTabFilter id="tabWithoutVehicle" text="Without Vehicle" key="withoutVehicletab" icon="sap-icon://request"><mvc:XMLView viewName="customerindent.view.WithOutVehTab"/></IconTabFilter><IconTabFilter id="tabInbound" text="Inbound" key="inboundtab" icon="sap-icon://cargo-train"><mvc:XMLView viewName="customerindent.view.InboundTab"/></IconTabFilter></items></IconTabBar></VBox></content></Page></mvc:View>

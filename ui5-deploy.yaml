@@ -1,0 +1,22 @@
+specVersion: "4.0"
+metadata:
+  name: customerindent
+type: application
+builder:
+  resources:
+    excludes:
+      - "/test/**"
+  customTasks:
+    - name: deploy-to-abap
+      afterTask: generateCachebusterInfo
+      configuration:
+        target:
+          url: http://s4hmock2.nrl.com:8001
+          client: "300"
+        app:
+          name: ZCUST_INDENT
+          description: Customer Indent Portal
+          package: ZSD
+          transport: D01K949622   # e.g. ECDK900123 - replace with the TR you created in the backend
+        exclude:
+          - /test/

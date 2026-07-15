@@ -1,0 +1,38 @@
+<mvc:View
+    controllerName="customerindent.bulk.controller.AddAgentDetails"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+    <Page
+        title="{i18n>addAgent.pageTitle}"
+        showNavButton="true"
+        navButtonPress=".onNavBack"
+        busy="{addAgentModel>/busy}"
+        enableScrolling="false"
+        class="addAgentPage">
+
+        <content>
+            <VBox width="100%" class="agent-page-outer">
+
+                <!-- Header -->
+                <VBox class="manage-header-section">
+                    <HBox alignItems="Center" wrap="Wrap">
+                        <Image src="img/logo.png" alt="Logo" class="sapUiTinyMarginEnd" />
+                        <VBox>
+                            <Title text="{i18n>addAgent.pageTitle}" level="H1" class="manage-page-title" />
+                            <Text text="{i18n>addAgent.pageSubtitle}" class="manage-page-subtitle" />
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- Side-by-side: Form + Table -->
+                <HBox alignItems="Stretch" class="agent-layout-row agent-layout-grow">
+                    <core:Fragment fragmentName="customerindent.bulk.view.AddAgentDetails.AgentForm" type="XML" />
+                    <core:Fragment fragmentName="customerindent.bulk.view.AddAgentDetails.AgentsTable" type="XML" />
+                </HBox>
+
+            </VBox>
+        </content>
+
+    </Page>
+</mvc:View>

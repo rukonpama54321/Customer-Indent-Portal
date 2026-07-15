@@ -1,0 +1,265 @@
+<mvc:View
+    controllerName="customerindent.controller.ChangeIndentWithVehicleTab"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns:layout="sap.ui.layout"
+    displayBlock="true">
+
+    <Page id="ChangeIndentWithVehicleTab" title="Change Customer Indent" showHeader="true">
+        <content>
+            <VBox class="ciPage sapUiSmallPadding">
+
+                <!-- ═══════════════════════════════════════════
+                     SECTION 1 — INDENT HEADER
+                ═══════════════════════════════════════════ -->
+                <VBox class="ciCard">
+                    <HBox class="ciCardHeader" alignItems="Center">
+                        <Text text="Change Indent — With Vehicle"/>
+                    </HBox>
+                    <VBox class="ciCardBody">
+                        <layout:Grid defaultSpan="L4 M6 S12" hSpacing="1" vSpacing="0">
+
+                            <!-- Loading Date (read-only) -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Loading Date" class="sapUiTinyMarginBottom"/>
+                                <DatePicker id="changeLoadingDatePicker"
+                                    value="{SelectedIndent>/BEGDA}"
+                                    editable="false"
+                                    valueFormat="dd.MM.yyyy"
+                                    displayFormat="dd.MM.yyyy"
+                                    placeholder="DD.MM.YYYY"
+                                    width="100%"/>
+                            </VBox>
+
+                            <!-- Vehicle (read-only) -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Vehicle" class="sapUiTinyMarginBottom"/>
+                                <Input id="changeVehicleInput"
+                                    value="{SelectedIndent>/VEHICLE}"
+                                    editable="false"
+                                    width="100%"
+                                    placeholder="Enter vehicle"
+                                    maxLength="25"/>
+                            </VBox>
+
+                            <!-- Customer (req) -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Customer" required="true" class="sapUiTinyMarginBottom"/>
+                                <Input id="changeCustomerSelect"
+                                    value="{SelectedIndent>/NAME1}"
+                                    width="100%"
+                                    placeholder="Select customer"
+                                    showValueHelp="true"
+                                    valueHelpRequest=".onCustomerSearch"/>
+                            </VBox>
+
+                            <!-- Sales Contract -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Sales Contract/Pricing Group" class="sapUiTinyMarginBottom"/>
+                                <Input id="changeSalesContractSelect"
+                                    value="{SelectedIndent>/CONTRACT}"
+                                    width="100%"
+                                    placeholder="Select contract"
+                                    showValueHelp="true"
+                                    valueHelpRequest=".onSalesContractSearch"/>
+                            </VBox>
+
+                            <!-- Transporter GSTN -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Transporter GSTN" class="sapUiTinyMarginBottom"/>
+                                <Input id="changeTransporterSelect"
+                                    value="{SelectedIndent>/TPT_GSTN}"
+                                    width="100%"
+                                    placeholder="Select GSTN"
+                                    showValueHelp="true"
+                                    valueHelpRequest=".onTransporterSearch"
+                                    editable="false"/>
+                            </VBox>
+
+                            <!-- End Use -->
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="End Use" class="sapUiTinyMarginBottom"/>
+                                <Input id="changeEndUseSelect"
+                                    value="{= ${SelectedIndent>/MS_END_USE} || ${SelectedIndent>/HSD_END_USE} }"
+                                    width="100%"
+                                    placeholder="Select end use"
+                                    showValueHelp="true"
+                                    valueHelpRequest=".onEndUseSearch"/>
+                            </VBox>
+                        </layout:Grid>
+                    </VBox>
+                </VBox>
+
+                <!-- ═══════════════════════════════════════════
+                     SECTION 2 — COMPARTMENT DETAILS
+                ═══════════════════════════════════════════ -->
+                <VBox class="ciCard">
+                    <HBox class="ciCardHeader" alignItems="Center">
+                        <Text text="Compartment Details"/>
+                    </HBox>
+                    <VBox class="ciCardBody">
+
+                        <!-- Fill-all helper row -->
+                        <HBox class="ciFillRow" alignItems="Center" wrap="Wrap">
+                            <Text text="Fill All Compartments:" class="sapUiSmallMarginEnd"/>
+                            <Input id="changeMasterProductSelect"
+                                   width="14rem" placeholder="Select product"
+                                   maxLength="25" showValueHelp="true"
+                                   valueHelpRequest="onCompProductSearch"
+                                   editable="false"
+                                   class="sapUiSmallMarginEnd"/>
+                            <Text text="Qty:" class="sapUiSmallMarginEnd"/>
+                            <Input id="changeMasterQty"
+                                   type="Number" width="7rem" placeholder="0.000"
+                                   editable="false"
+                                   class="sapUiSmallMarginEnd"/>
+                            <Button text="Apply to All"
+                                    icon="sap-icon://add"
+                                    press="onFillAllProducts"/>
+                        </HBox>
+
+                        <!-- COMP1-8 grid: Product + Quantity per compartment -->
+                        <layout:Grid defaultSpan="L3 M6 S12" hSpacing="1" vSpacing="0"
+                                     class="sapUiSmallMarginTop">
+                            <VBox class="ciCompCard">
+                                <HBox class="ciCompHeader"><Text text="COMP 1"/></HBox>
+                                <VBox class="ciCompBody">
+                                    <Label text="Product" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp1Product" value="{SelectedIndent>/PROD_CMP1}" width="100%" maxLength="25"
+                                           showValueHelp="true" valueHelpRequest="onCompProductSearch"
+                                           editable="false" class="sapUiSmallMarginBottom"/>
+                                    <Label text="Quantity" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp1Qty" value="{SelectedIndent>/QUAN_COMP1}" type="Number" width="100%"
+                                           placeholder="0.000" editable="false"/>
+                                </VBox>
+                            </VBox>
+                            <VBox class="ciCompCard">
+                                <HBox class="ciCompHeader"><Text text="COMP 2"/></HBox>
+                                <VBox class="ciCompBody">
+                                    <Label text="Product" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp2Product" value="{SelectedIndent>/PROD_CMP2}" width="100%" maxLength="25"
+                                           showValueHelp="true" valueHelpRequest="onCompProductSearch"
+                                           editable="false" class="sapUiSmallMarginBottom"/>
+                                    <Label text="Quantity" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp2Qty" value="{SelectedIndent>/QUAN_COMP2}" type="Number" width="100%"
+                                           placeholder="0.000" editable="false"/>
+                                </VBox>
+                            </VBox>
+                            <VBox class="ciCompCard">
+                                <HBox class="ciCompHeader"><Text text="COMP 3"/></HBox>
+                                <VBox class="ciCompBody">
+                                    <Label text="Product" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp3Product" value="{SelectedIndent>/PROD_CMP3}" width="100%" maxLength="25"
+                                           showValueHelp="true" valueHelpRequest="onCompProductSearch"
+                                           editable="false" class="sapUiSmallMarginBottom"/>
+                                    <Label text="Quantity" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp3Qty" value="{SelectedIndent>/QUAN_COMP3}" type="Number" width="100%"
+                                           placeholder="0.000" editable="false"/>
+                                </VBox>
+                            </VBox>
+                            <VBox class="ciCompCard">
+                                <HBox class="ciCompHeader"><Text text="COMP 4"/></HBox>
+                                <VBox class="ciCompBody">
+                                    <Label text="Product" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp4Product" value="{SelectedIndent>/PROD_CMP4}" width="100%" maxLength="25"
+                                           showValueHelp="true" valueHelpRequest="onCompProductSearch"
+                                           editable="false" class="sapUiSmallMarginBottom"/>
+                                    <Label text="Quantity" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp4Qty" value="{SelectedIndent>/QUAN_COMP4}" type="Number" width="100%"
+                                           placeholder="0.000" editable="false"/>
+                                </VBox>
+                            </VBox>
+                            <VBox class="ciCompCard">
+                                <HBox class="ciCompHeader"><Text text="COMP 5"/></HBox>
+                                <VBox class="ciCompBody">
+                                    <Label text="Product" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp5Product" value="{SelectedIndent>/PROD_CMP5}" width="100%" maxLength="25"
+                                           showValueHelp="true" valueHelpRequest="onCompProductSearch"
+                                           editable="false" class="sapUiSmallMarginBottom"/>
+                                    <Label text="Quantity" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp5Qty" value="{SelectedIndent>/QUAN_COMP5}" type="Number" width="100%"
+                                           placeholder="0.000" editable="false"/>
+                                </VBox>
+                            </VBox>
+                            <VBox class="ciCompCard">
+                                <HBox class="ciCompHeader"><Text text="COMP 6"/></HBox>
+                                <VBox class="ciCompBody">
+                                    <Label text="Product" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp6Product" value="{SelectedIndent>/PROD_CMP6}" width="100%" maxLength="25"
+                                           showValueHelp="true" valueHelpRequest="onCompProductSearch"
+                                           editable="false" class="sapUiSmallMarginBottom"/>
+                                    <Label text="Quantity" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp6Qty" value="{SelectedIndent>/QUAN_COMP6}" type="Number" width="100%"
+                                           placeholder="0.000" editable="false"/>
+                                </VBox>
+                            </VBox>
+                            <VBox class="ciCompCard">
+                                <HBox class="ciCompHeader"><Text text="COMP 7"/></HBox>
+                                <VBox class="ciCompBody">
+                                    <Label text="Product" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp7Product" value="{SelectedIndent>/PROD_CMP7}" width="100%" maxLength="25"
+                                           showValueHelp="true" valueHelpRequest="onCompProductSearch"
+                                           editable="false" class="sapUiSmallMarginBottom"/>
+                                    <Label text="Quantity" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp7Qty" value="{SelectedIndent>/QUAN_COMP7}" type="Number" width="100%"
+                                           placeholder="0.000" editable="false"/>
+                                </VBox>
+                            </VBox>
+                            <VBox class="ciCompCard">
+                                <HBox class="ciCompHeader"><Text text="COMP 8"/></HBox>
+                                <VBox class="ciCompBody">
+                                    <Label text="Product" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp8Product" value="{SelectedIndent>/PROD_CMP8}" width="100%" maxLength="25"
+                                           showValueHelp="true" valueHelpRequest="onCompProductSearch"
+                                           editable="false" class="sapUiSmallMarginBottom"/>
+                                    <Label text="Quantity" class="sapUiTinyMarginBottom"/>
+                                    <Input id="changeComp8Qty" value="{SelectedIndent>/QUAN_COMP8}" type="Number" width="100%"
+                                           placeholder="0.000" editable="false"/>
+                                </VBox>
+                            </VBox>
+                        </layout:Grid>
+
+                        <!-- End Use / Flushing (ATF) -->
+                        <layout:Grid defaultSpan="L4 M6 S12" hSpacing="1" vSpacing="0"
+                                     class="sapUiSmallMarginTop">
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Flushing Required (ATF)" class="sapUiTinyMarginBottom"/>
+                                <Select id="changeFlushingSelect" width="100%"
+                                        selectedKey="{SelectedIndent>/ATF_FLUSH}"
+                                        change=".onFlushingSelectChange">
+                                    <items>
+                                        <core:Item key="" text="Select"/>
+                                        <core:Item key="Y" text="Yes"/>
+                                        <core:Item key="N" text="No"/>
+                                    </items>
+                                </Select>
+                            </VBox>
+                            <VBox class="sapUiSmallMarginBottom">
+                                <Label text="Flushing Reason" class="sapUiTinyMarginBottom"/>
+                                <Input id="changeFlushingReasonSelect"
+                                       value="{SelectedIndent>/FLUSH_REASON}"
+                                       width="100%"
+                                       placeholder="Select reason"
+                                       maxLength="25"
+                                       showValueHelp="true"
+                                       valueHelpRequest="onFlushingReasonSearch"
+                                       enabled="false"/>
+                            </VBox>
+                        </layout:Grid>
+
+                        <!-- Update / Cancel -->
+                        <HBox justifyContent="Center" class="sapUiMediumMarginTop sapUiMediumMarginBottom">
+                            <Button id="changeUpdateBtn" text="Update" type="Emphasized"
+                                    icon="sap-icon://save" press="onUpdateIndent" width="18rem"
+                                    class="sapUiMediumMarginEnd"/>
+                            <Button id="changeCancelBtn" text="Back / Cancel"
+                                    icon="sap-icon://cancel" press="onCancelIndent" width="18rem"/>
+                        </HBox>
+
+                    </VBox>
+                </VBox>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>
