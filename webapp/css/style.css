@@ -183,3 +183,17 @@
 .ciMastBackBtn .sapMBtnIcon {
     color: #ffffff !important;
 }
+
+/* Vehicle-type group header in the Select Vehicle dialog */
+.ciVehTypeHeader {
+    background: linear-gradient(135deg, #1a3a52 0%, #0854a0 100%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+.ciVehTypeHeader .sapMGHLITitle {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.06em !important;
+    color: #ffffff !important;
+    font-family: '72', 'Segoe UI', Arial, sans-serif;
+}

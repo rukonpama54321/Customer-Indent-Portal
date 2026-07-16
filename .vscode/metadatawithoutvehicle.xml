@@ -34,9 +34,11 @@
 - <Key>
   <PropertyRef Name="KUNNR" /> 
   </Key>
-  <Property Name="KUNNR" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Customer" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
-  <Property Name="KUNNR_DESC" Type="Edm.String" MaxLength="30" sap:unicode="false" sap:label="Customer description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
-  <Property Name="CUST_USER_ID" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="User ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
+  <Property Name="KUNNR" Type="Edm.String" Nullable="false" MaxLength="10" sap:unicode="false" sap:label="Customer" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+  <Property Name="KUNNR_DESC" Type="Edm.String" MaxLength="30" sap:unicode="false" sap:label="Customer description" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+  <Property Name="ELIGIBLE" Type="Edm.String" MaxLength="1" sap:unicode="false" sap:label="Material Configured" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+  <Property Name="MAT_COUNT" Type="Edm.String" MaxLength="3" sap:unicode="false" sap:label="Material Count" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
+  <Property Name="CUST_USER_ID" Type="Edm.String" MaxLength="10" sap:unicode="false" sap:label="User ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" />
   <Property Name="SMTP_ADDR" Type="Edm.String" MaxLength="241" sap:unicode="false" sap:label="Email" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false" /> 
   </EntityType>
 - <EntityType Name="GetTransGSTIN" sap:content-version="1">

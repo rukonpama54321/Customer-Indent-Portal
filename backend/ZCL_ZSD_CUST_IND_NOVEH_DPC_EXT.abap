@@ -40,6 +40,8 @@ CLASS zcl_zsd_cust_ind_noveh_dpc_ext DEFINITION
     TYPES: BEGIN OF ty_customer,
              kunnr        TYPE kunnr,
              kunnr_desc   TYPE name1_gp,
+             eligible     TYPE char1,       " 'X' = at least one material configured (MaterialSet would return rows)
+             mat_count    TYPE char3,       " how many materials the customer's group has (WD dropdown size)
              cust_user_id TYPE xubname,
              smtp_addr    TYPE ad_smtpadr,
            END OF ty_customer.
@@ -59,6 +61,16 @@ CLASS zcl_zsd_cust_ind_noveh_dpc_ext DEFINITION
              matnr1       TYPE char40,
              matnr2       TYPE char40,
              vsbed        TYPE char20,
+             " ---- display-only contract details (GetOrderIdSet) ---------
+             " Product name (MAKT-MAKTX), contract ordered qty (VBAP-ZMENG),
+             " remaining available (get_contract_available - already computed
+             " to drop zero-balance contracts) and the contract UOM
+             " (VBAP-ZIEME). All in the contract's NATIVE UOM - CON_UOM1
+             " disambiguates the two qty figures.
+             matnr1_desc  TYPE makt-maktx,
+             con_ord_qty1 TYPE char17,
+             con_avl_qty1 TYPE char17,
+             con_uom1     TYPE vbap-zieme,
              cust_user_id TYPE xubname,
              smtp_addr    TYPE ad_smtpadr,
            END OF ty_orderid.
@@ -138,6 +150,17 @@ CLASS zcl_zsd_cust_ind_noveh_dpc_ext DEFINITION
       IMPORTING iv_kunnr      TYPE kunnr
       RETURNING VALUE(rt_mat) TYPE tt_material.
 
+    " Normalize a customer's KNVV sales-area group into the eligible-group
+    " space (DI,EX,OI,TG,ON), DETERMINISTICALLY: among the customer's eligible
+    " groups (ORDER BY kdgrp) prefer one that has materials in ZSD_INDT_NO_VEH,
+    " else the first eligible group. Single source of truth shared by
+    " get_customer_material and the GetCustomerSet eligibility flag so the
+    " dropdown-eligibility and the "No material" toast can never disagree - this
+    " only holds because the resolution is stable across calls (see IMPLEMENTATION).
+    METHODS resolve_cust_group
+      IMPORTING iv_kunnr        TYPE kunnr
+      RETURNING VALUE(rv_kdgrp) TYPE knvv-kdgrp.
+
     " Remaining available quantity on a sales contract for a material
     " (WD SELECT_CONTRACT_NVEH, out.txt:8619-8675 / WD SAVE, out.txt:8206-8275).
     " = contract ordered (VBAP-ZMENG) - delivered (VBFA vbtyp 'C')
@@ -178,6 +201,33 @@ CLASS zcl_zsd_cust_ind_noveh_dpc_ext IMPLEMENTATION.
         lt_cust = get_scope_customers( lv_uname ).
         SORT lt_cust BY kunnr.
         DELETE ADJACENT DUPLICATES FROM lt_cust COMPARING kunnr.
+
+        " Eligibility flag: mirror MaterialSet exactly so the dropdown never
+        " lands on a customer that then raises "No material configured". A
+        " customer is eligible iff ZSD_INDT_NO_VEH has >=1 row for the group
+        " resolve_cust_group() maps its KNVV entry to. Group counts are read
+        " once (not per customer) and matched in memory.
+        SELECT cust_group, COUNT(*) AS cnt
+          FROM zsd_indt_no_veh
+          INTO TABLE @DATA(lt_grpcnt)                                   "#EC CI_NOWHERE
+          GROUP BY cust_group.
+        LOOP AT lt_cust ASSIGNING FIELD-SYMBOL(<c>).
+          DATA(lv_grp) = resolve_cust_group( <c>-kunnr ).
+          READ TABLE lt_grpcnt INTO DATA(ls_gc) WITH KEY cust_group = lv_grp.
+          IF sy-subrc = 0 AND ls_gc-cnt > 0.
+            <c>-eligible  = 'X'.
+            DATA lv_cnt TYPE i.
+            lv_cnt        = ls_gc-cnt.
+            <c>-mat_count = lv_cnt.
+            CONDENSE <c>-mat_count.
+          ENDIF.
+        ENDLOOP.
+
+        " Segregate valid customers from invalid ones: eligible = 'X' sorts
+        " above space, so DESCENDING floats the valid (material-configured)
+        " customers to the top; KUNNR keeps a stable order within each block.
+        SORT lt_cust BY eligible DESCENDING kunnr ASCENDING.
+
         copy_data_to_ref( EXPORTING is_data = lt_cust CHANGING cr_data = er_entityset ).
 
       "---------------------------------------------- GetTransGSTINSet -
@@ -195,8 +245,11 @@ CLASS zcl_zsd_cust_ind_noveh_dpc_ext IMPLEMENTATION.
       "------------------------------------------------- GetOrderIdSet -
       WHEN 'GetOrderIdSet'.
         DATA lt_ord TYPE tt_orderid.
-        DATA: lv_okun TYPE kunnr,
-              lv_omat TYPE matnr.
+        DATA: lv_okun     TYPE kunnr,
+              lv_omat     TYPE matnr,
+              lv_oavl     TYPE ty_qty,
+              lv_ord_disp TYPE ty_qty,
+              lv_avl_disp TYPE ty_qty.
         lv_okun = get_filter_value( io_request = io_tech_request_context iv_property = 'KUNNR' ).
         lv_omat = get_filter_value( io_request = io_tech_request_context iv_property = 'MATNR1' ).
         IF lv_okun IS NOT INITIAL.
@@ -219,7 +272,7 @@ CLASS zcl_zsd_cust_ind_noveh_dpc_ext IMPLEMENTATION.
         " candidate contracts (WD SELECT_CONTRACT_NVEH, out.txt:8598-8608):
         " valid today, ship-to = customer, exact material, OWN-BOND valuation
         " at the user's depot, real item category (<> ZTAE), not rejected.
-        SELECT v~vbeln, a~matnr, v~vsbed
+        SELECT v~vbeln, a~matnr, v~vsbed, a~zmeng, a~zieme
           FROM vbak AS v
           INNER JOIN vbpa AS p ON p~vbeln = v~vbeln
           INNER JOIN vbap AS a ON a~vbeln = v~vbeln
@@ -235,8 +288,10 @@ CLASS zcl_zsd_cust_ind_noveh_dpc_ext IMPLEMENTATION.
         DELETE ADJACENT DUPLICATES FROM lt_vb COMPARING vbeln.
 
         LOOP AT lt_vb INTO DATA(ls_vb).
-          " drop contracts with no remaining balance (WD out.txt:8677 RQTY <= 0)
-          IF get_contract_available( iv_vbeln = ls_vb-vbeln iv_matnr = ls_vb-matnr ) <= 0.
+          " drop contracts with no remaining balance (WD out.txt:8677 RQTY <= 0);
+          " keep the figure - it is the availability shown in the value help
+          lv_oavl = get_contract_available( iv_vbeln = ls_vb-vbeln iv_matnr = ls_vb-matnr ).
+          IF lv_oavl <= 0.
             CONTINUE.
           ENDIF.
           DATA ls_ord TYPE ty_orderid.
@@ -245,6 +300,27 @@ CLASS zcl_zsd_cust_ind_noveh_dpc_ext IMPLEMENTATION.
           ls_ord-kunnr        = lv_okun.
           ls_ord-matnr1       = ls_vb-matnr.
           ls_ord-vsbed        = ls_vb-vsbed.
+          " contract details: ordered qty (VBAP-ZMENG) and available balance
+          " are both in the contract's native UOM. The customer enters the
+          " indent quantity in MT, so show these in MT too - a KG contract is
+          " 1 MT = 1000 KG (the same x1000 bridge the SAVE check uses). Non-KG
+          " contracts are displayed in their native UOM unchanged.
+          lv_ord_disp = ls_vb-zmeng.
+          lv_avl_disp = lv_oavl.
+          IF ls_vb-zieme = 'KG'.
+            lv_ord_disp     = lv_ord_disp / 1000.
+            lv_avl_disp     = lv_avl_disp / 1000.
+            ls_ord-con_uom1 = 'MT'.
+          ELSE.
+            ls_ord-con_uom1 = ls_vb-zieme.
+          ENDIF.
+          ls_ord-con_ord_qty1 = lv_ord_disp.
+          CONDENSE ls_ord-con_ord_qty1.
+          ls_ord-con_avl_qty1 = lv_avl_disp.
+          CONDENSE ls_ord-con_avl_qty1.
+          " product name for the contract material
+          SELECT SINGLE maktx FROM makt INTO ls_ord-matnr1_desc          "#EC CI_NOORDER
+            WHERE matnr = @ls_vb-matnr AND spras = @sy-langu.
           ls_ord-cust_user_id = lv_uname.
           APPEND ls_ord TO lt_ord.
         ENDLOOP.
@@ -725,16 +801,7 @@ CLASS zcl_zsd_cust_ind_noveh_dpc_ext IMPLEMENTATION.
     DATA lv_act1  TYPE char1.
     DATA lv_act2  TYPE char1.
 
-    SELECT SINGLE kdgrp FROM knvv INTO @lv_kdgrp                        "#EC CI_NOORDER
-      WHERE kunnr = @iv_kunnr.
-    " a customer can carry several KNVV rows (one per sales area); if the
-    " first is not DI/EX, re-read constrained to the eligible groups
-    IF lv_kdgrp <> 'DI' AND lv_kdgrp <> 'EX'.
-      SELECT SINGLE kdgrp FROM knvv INTO @lv_kdgrp                      "#EC CI_NOORDER
-        WHERE kunnr = @iv_kunnr
-          AND ( kdgrp = 'DI' OR kdgrp = 'EX' OR kdgrp = 'OI'
-             OR kdgrp = 'TG' OR kdgrp = 'ON' ).
-    ENDIF.
+    lv_kdgrp = resolve_cust_group( iv_kunnr ).
 
     IF lv_kdgrp = 'DI' OR lv_kdgrp = 'EX' OR lv_kdgrp = 'OI'
        OR lv_kdgrp = 'TG' OR lv_kdgrp = 'ON'.
@@ -754,6 +821,37 @@ CLASS zcl_zsd_cust_ind_noveh_dpc_ext IMPLEMENTATION.
                       active1 = lv_act1
                       active2 = lv_act2 ) TO rt_mat.
     ENDLOOP.
+  ENDMETHOD.
+
+  METHOD resolve_cust_group.
+    " A customer carries several KNVV rows (one per sales area) that may span
+    " more than one eligible group. The WebDynpro's "first row, else re-read"
+    " used SELECT SINGLE without ORDER BY, which is non-deterministic on HANA:
+    " the GetCustomerSet eligibility flag and the MaterialSet lookup could
+    " resolve the SAME customer to DIFFERENT groups and disagree ("green in the
+    " list, then No material configured on select"). We resolve deterministically
+    " and, among the customer's eligible groups, PREFER one that actually has
+    " materials in ZSD_INDT_NO_VEH - so the flag and MaterialSet agree by
+    " construction. (Deliberate correctness change over the WD port.)
+    SELECT DISTINCT kdgrp FROM knvv INTO TABLE @DATA(lt_grp)            "#EC CI_NOORDER
+      WHERE kunnr = @iv_kunnr
+        AND ( kdgrp = 'DI' OR kdgrp = 'EX' OR kdgrp = 'OI'
+           OR kdgrp = 'TG' OR kdgrp = 'ON' )
+      ORDER BY kdgrp.
+    LOOP AT lt_grp INTO DATA(ls_g).
+      SELECT SINGLE cust_group FROM zsd_indt_no_veh INTO @DATA(lv_has)  "#EC CI_NOORDER
+        WHERE cust_group = @ls_g-kdgrp.
+      IF sy-subrc = 0.
+        rv_kdgrp = ls_g-kdgrp.
+        RETURN.
+      ENDIF.
+    ENDLOOP.
+    " none of the eligible groups have materials -> return the first eligible
+    " one consistently so both checks agree the customer is NOT eligible
+    READ TABLE lt_grp INTO ls_g INDEX 1.
+    IF sy-subrc = 0.
+      rv_kdgrp = ls_g-kdgrp.
+    ENDIF.
   ENDMETHOD.
 
   METHOD get_contract_available.

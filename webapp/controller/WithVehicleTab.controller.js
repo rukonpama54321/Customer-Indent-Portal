@@ -3,15 +3,18 @@ sap.ui.define([
     "sap/ui/core/UIComponent",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
+    "sap/ui/model/Sorter",
     "sap/ui/model/json/JSONModel",
     "sap/m/SelectDialog",
     "sap/m/StandardListItem",
+    "sap/m/GroupHeaderListItem",
     "sap/m/MessageBox",
     "sap/m/MessageToast",
+    "sap/ui/core/BusyIndicator",
     "customerindent/util/formatter",
     "customerindent/util/UserInfo"
-], function (Controller, UIComponent, Filter, FilterOperator, JSONModel,
-             SelectDialog, StandardListItem, MessageBox, MessageToast, formatter, UserInfo) {
+], function (Controller, UIComponent, Filter, FilterOperator, Sorter, JSONModel,
+             SelectDialog, StandardListItem, GroupHeaderListItem, MessageBox, MessageToast, BusyIndicator, formatter, UserInfo) {
     "use strict";
 
     // Compartment field id helpers
@@ -45,6 +48,15 @@ sap.ui.define([
             }
 
             this._resetCompartments();
+
+            // Initial load: populate the Saved Indents table with the indents
+            // already created for the customers mapped to this user. The date
+            // filter now holds today's value and _userFilters() scopes the read
+            // to CUST_USER_ID / SMTP_ADDR, so a plain onGetIndents() fetches
+            // exactly this user's indents without any manual Search.
+            if (oFilterDate && oFilterDate.getValue()) {
+                this.onGetIndents();
+            }
             // Customers are NOT preloaded here. Like the Without-Vehicle tab,
             // the customer list is fetched on demand the first time the value
             // help opens (onCustomerSearch), so a page reload does not fire a
@@ -155,6 +167,9 @@ sap.ui.define([
                 if (fnDone) { fnDone(this._aVehicleData); }
                 return;
             }
+            // VehicleSet is a large read; show the global loading wheel while
+            // it is in flight so the value-help / type-ahead wait is visible.
+            BusyIndicator.show(0);
             this._getModel().read("/VehicleSet", {
                 success: function (oData) {
                     that._aVehicleData = (oData.results || []).sort(function (a, b) {
@@ -166,9 +181,11 @@ sap.ui.define([
                         that.getView().setModel(oVehModel, "veh");
                     }
                     oVehModel.setData({ results: that._aVehicleData });
+                    BusyIndicator.hide();
                     if (fnDone) { fnDone(that._aVehicleData); }
                 },
                 error: function () {
+                    BusyIndicator.hide();
                     MessageToast.show("Failed to load vehicle list");
                     if (fnFail) { fnFail(); }
                 }
@@ -244,6 +261,13 @@ sap.ui.define([
                 });
                 this._oVehicleDialog.bindAggregation("items", {
                     path: "veh>/results",
+                    sorter: new Sorter("TU_TEXT", false, true),   // group by vehicle type
+                    groupHeaderFactory: function (oGroup) {
+                        return new GroupHeaderListItem({
+                            title: oGroup.key,
+                            upperCase: true
+                        }).addStyleClass("ciVehTypeHeader");
+                    },
                     template: new StandardListItem({
                         title: "{veh>TU_NUMBER}",
                         description: "{veh>TU_TEXT}",
@@ -814,7 +838,11 @@ sap.ui.define([
                 BEGDA: this._toIsoDate(oView.byId("loadingDatePicker").getValue()),
                 VEHICLE: sVehicle,
                 KUNNR: this._sSelectedCustomerId,
-                KUNNR_DESC: oView.byId("customerSelect").getValue(),
+                // KUNNR_DESC is an EDM string of MaxLength 30 (DDIC C(30)); the
+                // customer name from ZUSERSet.NAME1 is CHAR35, so long names
+                // (e.g. "RELIANCE INDUSTRIES LIMITED, NRL DU…") overflow the
+                // facet and the create dumps with CX_DS_EDM_FACET_ERROR. Cap it.
+                KUNNR_DESC: (oView.byId("customerSelect").getValue() || "").substring(0, 30),
                 CONTRACT: oView.byId("salesContractSelect").getValue(),
                 TPT_GSTN: oGstn.getValue(),
                 MS_END_USE: bHsdEndUse ? "" : sEndUse,

@@ -7,9 +7,10 @@ sap.ui.define([
     "sap/m/StandardListItem",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
+    "sap/ui/model/Sorter",
     "customerindent/util/UserInfo"
 ], function (Controller, JSONModel, MessageBox, MessageToast, SelectDialog,
-             StandardListItem, Filter, FilterOperator, UserInfo) {
+             StandardListItem, Filter, FilterOperator, Sorter, UserInfo) {
     "use strict";
 
     /* ════════════════════════════════════════════════════════════════
@@ -78,41 +79,97 @@ sap.ui.define([
             var oUserInfo = UserInfo.getLoginInfo();
 
             if (!this._oCustDialog) {
+                // client-side model behind the dialog: GetCustomerSet is fetched
+                // ONCE with the user-scope filter (the only filter the backend
+                // honours), then search runs locally against these rows.
+                this._oCustVHModel = new JSONModel({ rows: [] });
+
                 this._oCustDialog = new SelectDialog({
                     title: "Select Customer",
                     confirm: function (oEv) {
                         var oItem = oEv.getParameter("selectedItem");
                         if (!oItem) { return; }
-                        var oCtx  = oItem.getBindingContext("withoutvehModel").getObject();
+                        var oCtx  = oItem.getBindingContext("custVH").getObject();
+                        // eligibility is pre-computed by GetCustomerSet; block
+                        // the selection here so the user never lands on a
+                        // customer that has no material configured.
+                        if (oCtx.ELIGIBLE !== "X") {
+                            MessageToast.show("No material is configured for this customer.");
+                            return;
+                        }
                         var oForm = this.getView().getModel("novehForm");
                         oForm.setProperty("/KUNNR",      oCtx.KUNNR);
                         oForm.setProperty("/KUNNR_DESC", oCtx.KUNNR_DESC);
                         this._loadMaterials(oCtx.KUNNR);
                     }.bind(this),
-                    search: function (oEv) {
-                        var sVal     = oEv.getParameter("value");
-                        var oBinding = oEv.getSource().getBinding("items");
-                        oBinding.filter(sVal
-                            ? [new Filter("KUNNR_DESC", FilterOperator.Contains, sVal)]
-                            : []);
-                    }
+                    // match on both the customer name and number; client-side so
+                    // it actually filters (server ignores these filters)
+                    search:     this._filterCustVH,
+                    liveChange: this._filterCustVH
+                });
+
+                this._oCustDialog.setModel(this._oCustVHModel, "custVH");
+                this._oCustDialog.bindAggregation("items", {
+                    model:    "custVH",
+                    path:     "/rows",
+                    // valid (material-configured) customers first: ELIGIBLE 'X'
+                    // sorts above blank when descending. Client-side so the
+                    // ordering holds regardless of the backend row order; KUNNR
+                    // keeps a stable order within each block.
+                    sorter:   [new Sorter("ELIGIBLE", true), new Sorter("KUNNR", false)],
+                    template: new StandardListItem({
+                        title:       "{custVH>KUNNR_DESC}",
+                        description: "{custVH>KUNNR}",
+                        // right-aligned material status: green count when configured,
+                        // red "No material" otherwise (parity with the save-time toast)
+                        info: {
+                            parts: ["custVH>ELIGIBLE", "custVH>MAT_COUNT"],
+                            formatter: function (sEligible, sCount) {
+                                if (sEligible !== "X") { return "No material"; }
+                                return (sCount || "0") + " material" + (sCount === "1" ? "" : "s");
+                            }
+                        },
+                        infoState: {
+                            path: "custVH>ELIGIBLE",
+                            formatter: function (sEligible) {
+                                return sEligible === "X" ? "Success" : "Error";
+                            }
+                        }
+                    })
                 });
                 this.getView().addDependent(this._oCustDialog);
             }
 
-            this._oCustDialog.bindAggregation("items", {
-                model:   "withoutvehModel",
-                path:    "/GetCustomerSet",
+            // (re)load the user-scoped customer list, then open
+            this._oCustDialog.open();
+            this._getModel().read("/GetCustomerSet", {
                 filters: [
                     new Filter("CUST_USER_ID", FilterOperator.EQ, oUserInfo.userId),
                     new Filter("SMTP_ADDR",    FilterOperator.EQ, oUserInfo.email)
                 ],
-                template: new StandardListItem({
-                    title:       "{withoutvehModel>KUNNR_DESC}",
-                    description: "{withoutvehModel>KUNNR}"
-                })
+                success: function (oData) {
+                    this._oCustVHModel.setProperty("/rows", (oData && oData.results) || []);
+                }.bind(this),
+                error: function (oErr) {
+                    MessageBox.error(this._extractError(oErr,
+                        "Could not load the customer list."));
+                }.bind(this)
             });
-            this._oCustDialog.open();
+        },
+
+        // client-side customer value-help filter (name OR number contains)
+        _filterCustVH: function (oEv) {
+            var sVal     = oEv.getParameter("value");
+            var oBinding = oEv.getSource().getBinding("items");
+            oBinding.filter(sVal
+                ? [new Filter({
+                    filters: [
+                        new Filter("KUNNR_DESC", FilterOperator.Contains, sVal),
+                        new Filter("KUNNR",      FilterOperator.Contains, sVal)
+                    ],
+                    and: false
+                })]
+                : []);
         },
 
         // Load the customer's material(s) + per-material enable flags.
@@ -212,8 +269,32 @@ sap.ui.define([
                 path:     "/GetOrderIdSet",
                 filters:  aFilters,
                 template: new StandardListItem({
+                    // title stays ORDER_NO - confirm() reads getTitle() for CONTRACT1
                     title:       "{withoutvehModel>ORDER_NO}",
-                    description: "{withoutvehModel>VSBED}"
+                    // product name + contract ordered qty + shipping conditions
+                    description: {
+                        parts: [
+                            "withoutvehModel>MATNR1_DESC",
+                            "withoutvehModel>CON_ORD_QTY1",
+                            "withoutvehModel>CON_UOM1",
+                            "withoutvehModel>VSBED"
+                        ],
+                        formatter: function (sDesc, sOrd, sUom, sVsbed) {
+                            var aParts = [];
+                            if (sDesc) { aParts.push(sDesc); }
+                            if (sOrd)  { aParts.push("Contract " + sOrd + (sUom ? " " + sUom : "")); }
+                            if (sVsbed) { aParts.push(sVsbed); }
+                            return aParts.join("  ·  ");
+                        }
+                    },
+                    // remaining available balance, right-aligned
+                    info: {
+                        parts: ["withoutvehModel>CON_AVL_QTY1", "withoutvehModel>CON_UOM1"],
+                        formatter: function (sAvl, sUom) {
+                            return sAvl ? ("Avail " + sAvl + (sUom ? " " + sUom : "")) : "";
+                        }
+                    },
+                    infoState: "Success"
                 })
             });
             this._oContractDialog.open();
