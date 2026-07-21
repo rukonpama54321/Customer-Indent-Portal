@@ -6,7 +6,7 @@
     <Panel headerText="Search Criteria" expandable="true" expanded="true">
         <content>
             <VBox class="sapUiSmallMargin">
-                <HBox wrap="Wrap" alignItems="End">
+                <HBox wrap="Wrap" alignItems="Start">
                     <VBox class="sapUiSmallMarginEnd">
                         <Label text="Customer Reference Date Range" />
                         <HBox>
@@ -25,7 +25,32 @@
                                 placeholder="To date" />
                         </HBox>
                     </VBox>
+                    <VBox class="sapUiSmallMarginEnd" width="20rem">
+                        <Label text="Product (optional)" />
+                        <ComboBox
+                            selectedKey="{viewModel>/filterMaterial}"
+                            placeholder="All Products"
+                            width="100%"
+                            items="{viewModel>/materialOptions}">
+                            <core:Item key="{viewModel>MATNR}" text="{viewModel>text}" />
+                        </ComboBox>
+                        <Label
+                            text="{viewModel>/uomHint}"
+                            visible="{= !!${viewModel>/uomHint} }"
+                            class="sapUiTinyMarginTop"
+                            design="Standard" />
+                    </VBox>
+                    <VBox class="sapUiSmallMarginEnd" width="13rem">
+                        <Label text="Min. Quantity (optional)" />
+                        <Input
+                            value="{viewModel>/filterQuantity}"
+                            type="Number"
+                            placeholder="Any quantity"
+                            width="100%" />
+                    </VBox>
                     <VBox>
+                        <!-- Spacer keeps the button aligned with the input controls, not the labels -->
+                        <Label text="&#160;" />
                         <Button
                             text="Search"
                             type="Emphasized"

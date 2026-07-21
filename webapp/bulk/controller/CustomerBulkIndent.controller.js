@@ -10,25 +10,32 @@ sap.ui.define([
 
     return Controller.extend("customerindent.bulk.controller.CustomerBulkIndent", {
         onInit: function () {
+            // Default both ends of the range to today; the user can widen it as needed.
             var oToday = new Date();
-            var oFromDate = new Date();
-            oFromDate.setDate(oToday.getDate() - 2);
 
             var oViewModel = new JSONModel({
                 busy: false,
-                fromDate: this._formatDateToValue(oFromDate),
+                fromDate: this._formatDateToValue(oToday),
                 toDate: this._formatDateToValue(oToday),
                 headers: [],
                 allHeaders: null,
                 showEmptyMessage: false,
                 filterAssignmentStatus: "",
                 filterShippingCondition: "",
+                filterMaterial: "",
+                filterQuantity: "",
+                uomHint: "",
+                materialOptions: [{ MATNR: "", text: "All Products" }],
                 createdOrders: [],
                 selectedOrdersSubTab: "allOrders"
             });
 
             this.getView().setModel(oViewModel, "viewModel");
-            
+
+            // Preload the product catalog so the customer can pick a product as part
+            // of the search criteria (before any date-range search has been run).
+            this._loadMaterialCatalog();
+
             // Attach route matched handler to check for refresh flag
             var oRouter = this.getOwnerComponent().getRouter();
             if (oRouter) {
@@ -128,7 +135,8 @@ sap.ui.define([
                         });
                     });
 
-                    // Reset filters on new search
+                    // Reset the quick filters on new search (product/quantity are
+                    // part of the search criteria, so they are intentionally kept).
                     oViewModel.setProperty("/showAssignedOrders", true);
                     oViewModel.setProperty("/filterShippingCondition", "");
 
@@ -212,12 +220,14 @@ sap.ui.define([
                             });
 
                             oViewModel.setProperty("/allHeaders", aFinal);
+                            this._buildMaterialOptions();
                             this._applyFilters();
                             oViewModel.setProperty("/busy", false);
                         }.bind(this),
                         error: function () {
                             // Fallback: proceed without partial assignment info
                             oViewModel.setProperty("/allHeaders", aWithFlags);
+                            this._buildMaterialOptions();
                             this._applyFilters();
                             oViewModel.setProperty("/busy", false);
                         }.bind(this)
@@ -271,11 +281,102 @@ sap.ui.define([
             this._applyFilters();
         },
 
+        /**
+         * Loads the distinct product catalog (MATNR + description) from
+         * SALESORDERItemSet so the Product search dropdown is populated up front,
+         * before any date-range search has been run. Falls back silently — if this
+         * fails, the dropdown still fills in from each search's results.
+         */
+        _loadMaterialCatalog: function() {
+            var oModel = this.getView().getModel();
+            if (!oModel) {
+                return;
+            }
+
+            oModel.read("/SALESORDERItemSet", {
+                urlParameters: {
+                    "$select": "MATNR,ARKTX",
+                    "$top": "5000"
+                },
+                success: function(oData) {
+                    var aResults = (oData && oData.results) ? oData.results : [];
+                    this._mergeMaterialOptions(aResults);
+                }.bind(this),
+                error: function() {
+                    // Silent: search results will still populate the dropdown.
+                }
+            });
+        },
+
+        /**
+         * Merges the given item-like objects (each with MATNR/ARKTX) into the
+         * Product dropdown options, de-duplicated by material and sorted, keeping
+         * the leading "All Products" entry (empty key) first.
+         */
+        _mergeMaterialOptions: function(aItems) {
+            var oViewModel = this.getView().getModel("viewModel");
+            var aOptions = (oViewModel.getProperty("/materialOptions") || []).slice();
+            var oSeen = {};
+            aOptions.forEach(function(o) {
+                if (o.MATNR) {
+                    oSeen[o.MATNR] = true;
+                }
+            });
+
+            (aItems || []).forEach(function(oItem) {
+                var sMATNR = oItem.MATNR || "";
+                if (sMATNR && !oSeen[sMATNR]) {
+                    oSeen[sMATNR] = true;
+                    var sDesc = oItem.ARKTX || "";
+                    aOptions.push({
+                        MATNR: sMATNR,
+                        text: sDesc ? (sMATNR + " - " + sDesc) : sMATNR
+                    });
+                }
+            });
+
+            aOptions.sort(function(a, b) {
+                if (a.MATNR === "") { return -1; }
+                if (b.MATNR === "") { return 1; }
+                return a.MATNR < b.MATNR ? -1 : (a.MATNR > b.MATNR ? 1 : 0);
+            });
+
+            oViewModel.setProperty("/materialOptions", aOptions);
+        },
+
+        /**
+         * Adds any products found in the currently loaded sales documents to the
+         * Product dropdown (union with the preloaded catalog).
+         */
+        _buildMaterialOptions: function() {
+            var oViewModel = this.getView().getModel("viewModel");
+            var aAllHeaders = oViewModel.getProperty("/allHeaders") || [];
+            var aItems = [];
+            var oUomSeen = {};
+            var aUoms = [];
+            aAllHeaders.forEach(function(oHeader) {
+                var aHeaderItems = (oHeader.ToItem && oHeader.ToItem.results) || [];
+                aHeaderItems.forEach(function(oItem) {
+                    aItems.push(oItem);
+                    var sUom = (oItem.VRKME || "").trim();
+                    if (sUom && !oUomSeen[sUom]) {
+                        oUomSeen[sUom] = true;
+                        aUoms.push(sUom);
+                    }
+                });
+            });
+            aUoms.sort();
+            oViewModel.setProperty("/uomHint", aUoms.length ? ("Quantities in " + aUoms.join(", ")) : "");
+            this._mergeMaterialOptions(aItems);
+        },
+
         _applyFilters: function() {
             var oViewModel = this.getView().getModel("viewModel");
             var aAllHeaders = oViewModel.getProperty("/allHeaders") || [];
             var sAssignmentStatus = oViewModel.getProperty("/filterAssignmentStatus") || "";
             var sShippingCondition = oViewModel.getProperty("/filterShippingCondition");
+            var sFilterMaterial = oViewModel.getProperty("/filterMaterial") || "";
+            var sFilterQuantity = oViewModel.getProperty("/filterQuantity");
             var sSelectedSubTab = oViewModel.getProperty("/selectedOrdersSubTab") || "allOrders";
             
             // Apply filters
@@ -306,7 +407,28 @@ sap.ui.define([
                 if (sShippingCondition && oHeader.VSBED !== sShippingCondition) {
                     return false;
                 }
-                
+
+                // Filter by product + available quantity (part of the search criteria).
+                // A document qualifies when it has at least one item of the selected
+                // product whose still-available quantity (KWMENG, treated as 0 once the
+                // order is fully assigned) meets the requested minimum. With no quantity
+                // entered, any document that still has that product available qualifies.
+                if (sFilterMaterial) {
+                    var fReqQty = parseFloat(sFilterQuantity);
+                    var bHasReqQty = !isNaN(fReqQty) && fReqQty > 0;
+                    var aItems = (oHeader.ToItem && oHeader.ToItem.results) || [];
+                    var bMatch = aItems.some(function (oItem) {
+                        if (oItem.MATNR !== sFilterMaterial) {
+                            return false;
+                        }
+                        var fAvail = oItem.__showZeroQty ? 0 : parseFloat(oItem.KWMENG || "0");
+                        return bHasReqQty ? (fAvail >= fReqQty) : (fAvail > 0);
+                    });
+                    if (!bMatch) {
+                        return false;
+                    }
+                }
+
                 return true;
             });
             
@@ -521,6 +643,7 @@ sap.ui.define([
                     });
 
                     oViewModel.setProperty("/allHeaders", aUpdated);
+                    this._buildMaterialOptions();
                     this._applyFilters();
                     oViewModel.setProperty("/busy", false);
                 }.bind(this),
