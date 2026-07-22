@@ -41,11 +41,11 @@
                             design="Standard" />
                     </VBox>
                     <VBox class="sapUiSmallMarginEnd" width="13rem">
-                        <Label text="Min. Quantity (optional)" />
+                        <Label text="Min. Quantity in MT (optional)" />
                         <Input
                             value="{viewModel>/filterQuantity}"
                             type="Number"
-                            placeholder="Any quantity"
+                            placeholder="Any quantity (MT)"
                             width="100%" />
                     </VBox>
                     <VBox>
@@ -98,6 +98,7 @@
                                 <core:Item key="unassigned" text="Unassigned" />
                                 <core:Item key="partial" text="Partially Assigned" />
                                 <core:Item key="assigned" text="Fully Assigned" />
+                                <core:Item key="noOpenQty" text="No Open Qty" />
                             </items>
                         </ComboBox>
                     </VBox>
@@ -107,13 +108,13 @@
     </Panel>
 
     <MessageStrip
-        text="No sales documents found for the selected date range."
+        text="No contracts found for the selected date range."
         type="Information"
         showIcon="true"
         visible="{viewModel>/showEmptyMessage}" />
 
     <VBox visible="{= ${viewModel>/headers}.length > 0 }">
-        <Title text="Sales Documents" />
+        <Title text="Contracts" />
         <List
             id="salesOrderList"
             items="{viewModel>/headers}"
@@ -152,10 +153,16 @@
                                         visible="{viewModel>__isPartiallyAssigned}"
                                         class="sapUiTinyMarginBottom" />
                                     <ObjectStatus
+                                        text="No Open Qty"
+                                        state="Error"
+                                        icon="sap-icon://sys-cancel"
+                                        visible="{viewModel>__isNoOpenQty}"
+                                        class="sapUiTinyMarginBottom" />
+                                    <ObjectStatus
                                         text="Unassigned"
                                         state="None"
                                         icon="sap-icon://pending"
-                                        visible="{= !${viewModel>__isAssigned} &amp;&amp; !${viewModel>__isPartiallyAssigned} }"
+                                        visible="{= !${viewModel>__isAssigned} &amp;&amp; !${viewModel>__isPartiallyAssigned} &amp;&amp; !${viewModel>__isNoOpenQty} }"
                                         class="sapUiTinyMarginBottom" />
                                 </VBox>
                             </HBox>

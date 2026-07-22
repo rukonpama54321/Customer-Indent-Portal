@@ -277,10 +277,11 @@ sap.ui.define([
         },
 
         onDeleteAgent: function (oEvent) {
-            var oItem = oEvent.getSource().getParent(); // Button → ColumnListItem
-            var oCtx  = oItem.getBindingContext("addAgentModel");
-            var sId   = oCtx.getProperty("AGENT_ID");
-            var sName = oCtx.getProperty("AGENT_NAME");
+            var oItem  = oEvent.getSource().getParent(); // Button → ColumnListItem
+            var oCtx   = oItem.getBindingContext("addAgentModel");
+            var sId    = oCtx.getProperty("AGENT_ID");
+            var sName  = oCtx.getProperty("AGENT_NAME");
+            var sKunnr = oCtx.getProperty("KUNNR");
 
             MessageBox.confirm(
                 "Delete agent \"" + sName + "\" (ID: " + sId + ")?\nThis cannot be undone.",
@@ -293,7 +294,13 @@ sap.ui.define([
                         var oODataModel = this.getView().getModel();
                         var oViewModel  = this.getView().getModel("addAgentModel");
                         oViewModel.setProperty("/busy", true);
-                        oODataModel.remove("/AgentDetailsSet('" + sId + "')", {
+                        // AgentDetails has a composite key (AGENT_ID + KUNNR);
+                        // let createKey build the predicate from the metadata.
+                        var sPath = "/" + oODataModel.createKey("AgentDetailsSet", {
+                            AGENT_ID: sId,
+                            KUNNR: sKunnr
+                        });
+                        oODataModel.remove(sPath, {
                             success: function () {
                                 oViewModel.setProperty("/busy", false);
                                 MessageToast.show("Agent " + sId + " deleted.");

@@ -13,6 +13,12 @@ sap.ui.define([
             // Default both ends of the range to today; the user can widen it as needed.
             var oToday = new Date();
 
+            var sUser = sessionStorage.getItem("portal_username") || "";
+            // Prefer a previously resolved SAP display name for this session so the
+            // header doesn't flash the raw username before start_up responds.
+            var sCachedName = sessionStorage.getItem("portal_userfullname") || "";
+            var sInitialName = sCachedName || (sUser ? sUser.toUpperCase() : "User");
+
             var oViewModel = new JSONModel({
                 busy: false,
                 fromDate: this._formatDateToValue(oToday),
@@ -27,10 +33,16 @@ sap.ui.define([
                 uomHint: "",
                 materialOptions: [{ MATNR: "", text: "All Products" }],
                 createdOrders: [],
-                selectedOrdersSubTab: "allOrders"
+                selectedOrdersSubTab: "allOrders",
+                currentUser: sInitialName,
+                currentUserInitials: this._getInitials(sCachedName || sUser)
             });
 
             this.getView().setModel(oViewModel, "viewModel");
+
+            // Resolve the real SAP user (sy-uname + full name) from the standard
+            // start_up service and update the header when it responds.
+            this._loadSapUser();
 
             // Preload the product catalog so the customer can pick a product as part
             // of the search criteria (before any date-range search has been run).
@@ -51,6 +63,73 @@ sap.ui.define([
             } else {
                 window.history.back();
             }
+        },
+
+        /**
+         * Derives up to two initials from a username for the header avatar.
+         * Splits on common separators (space, dot, underscore, hyphen); if the
+         * name is a single token, uses its first two characters.
+         */
+        _getInitials: function (sUser) {
+            if (!sUser) { return "U"; }
+            var aParts = sUser.trim().split(/[\s._-]+/).filter(Boolean);
+            if (aParts.length >= 2) {
+                return (aParts[0].charAt(0) + aParts[1].charAt(0)).toUpperCase();
+            }
+            return sUser.trim().substring(0, 2).toUpperCase();
+        },
+
+        /**
+         * Fetches the authoritative logged-in SAP user from the standard
+         * /sap/bc/ui2/start_up service and updates the header.
+         *
+         * Auth: on production (BSP) the session cookie identifies the user, so
+         * credentials:"include" is enough. On localhost the dev proxy does not
+         * inject the OData model's Basic-Auth header into arbitrary fetches, so
+         * we attach it here from the token stored at login.
+         *
+         * Falls back silently to the typed username already in the model if the
+         * service is unavailable (e.g. the ICF node is inactive).
+         */
+        _loadSapUser: function () {
+            var bIsLocal = window.location.hostname === "localhost" ||
+                           window.location.hostname === "127.0.0.1";
+            var mHeaders = { "Accept": "application/json" };
+            if (bIsLocal) {
+                var sToken = sessionStorage.getItem("portal_token");
+                if (sToken) {
+                    mHeaders["Authorization"] = "Basic " + sToken;
+                }
+                mHeaders["sap-client"] = "300";
+            }
+
+            fetch("/sap/bc/ui2/start_up", {
+                method: "GET",
+                credentials: "include",
+                headers: mHeaders
+            })
+            .then(function (oResponse) {
+                if (!oResponse.ok) {
+                    throw new Error("start_up returned " + oResponse.status);
+                }
+                return oResponse.json();
+            })
+            .then(function (oData) {
+                if (!oData) { return; }
+                var sFullName = oData.fullName ||
+                    ((oData.firstName || "") + " " + (oData.lastName || "")).trim() ||
+                    oData.id || "";
+                if (!sFullName) { return; }
+
+                var oViewModel = this.getView().getModel("viewModel");
+                if (!oViewModel) { return; }
+                oViewModel.setProperty("/currentUser", sFullName);
+                oViewModel.setProperty("/currentUserInitials", this._getInitials(sFullName));
+                sessionStorage.setItem("portal_userfullname", sFullName);
+            }.bind(this))
+            .catch(function () {
+                // Keep the typed-username fallback already in the model.
+            });
         },
 
         _onRouteMatched: function () {
@@ -116,22 +195,26 @@ sap.ui.define([
                     console.log("=== Sales Order Data Loaded ===");
                     console.log("Number of orders:", aResults.length);
                     
-                    // Mark orders as assigned if all items have KWMENG = 0
+                    // Record whether all items already have KWMENG = 0. This alone does NOT
+                    // mean "fully assigned" – a sales doc can arrive from SAP with 0 open qty
+                    // and no bulk indents at all. The __isAssigned / __isNoOpenQty distinction
+                    // is finalized after the CustomerOrderSet fetch (needs bHasOrders).
                     var aWithFlags = aResults.map(function (oHeader) {
-                        var isAssigned = false;
-                        
+                        var bAllZeroQty = false;
+
                         if (oHeader.ToItem && oHeader.ToItem.results && oHeader.ToItem.results.length > 0) {
-                            // Check if all items have quantity = 0 (fully assigned)
-                            isAssigned = oHeader.ToItem.results.every(function(oItem) {
+                            bAllZeroQty = oHeader.ToItem.results.every(function(oItem) {
                                 var qty = parseFloat(oItem.KWMENG || "0");
                                 return qty === 0;
                             });
                         }
-                        
+
                         return Object.assign({}, oHeader, {
                             __expanded: false,
-                            __isAssigned: isAssigned,
-                            __isPartiallyAssigned: false  // will be set after CustomerOrderSet fetch
+                            __allZeroQty: bAllZeroQty,
+                            __isAssigned: false,           // set after CustomerOrderSet fetch
+                            __isPartiallyAssigned: false,  // set after CustomerOrderSet fetch
+                            __isNoOpenQty: false           // set after CustomerOrderSet fetch
                         });
                     });
 
@@ -185,10 +268,12 @@ sap.ui.define([
                                 }
                             });
 
-                            // Mark __isAssigned / __isPartiallyAssigned:
-                            // - DL orders: fully assigned as soon as any bulk indent exists
-                            // - NO/N/A third-party orders: fully assigned as soon as bulk indent exists
-                            // - Other orders: fully assigned only when all SAP item quantities reach 0
+                            // Mark __isAssigned / __isPartiallyAssigned / __isNoOpenQty:
+                            // - Fully assigned requires at least one bulk indent (bHasOrders):
+                            //     * DL orders / NO-N/A third-party orders: as soon as a bulk indent exists
+                            //     * Other orders: when all SAP item quantities have reached 0
+                            // - All-zero qty with NO bulk indent = "No Open Qty" (arrived empty from SAP),
+                            //   NOT fully assigned.
                             var aFinal = aWithFlags.map(function (oHeader) {
                                 var sKey = fnNorm(oHeader.VBELN);
                                 var bHasOrders = !!oSalesOrdersWithOrders[sKey];
@@ -197,12 +282,15 @@ sap.ui.define([
                                 var sThirdPartyRaw = oSalesOrderThirdPartyRaw[sKey] || "";
 
                                 var bIsDL = oHeader.VSBED === "DL";
-                                var bIsFullyAssigned = oHeader.__isAssigned || (bHasOrders && (bIsDL || bIsNoThirdParty));
+                                var bAllZeroQty = !!oHeader.__allZeroQty;
+                                var bIsFullyAssigned = bHasOrders && (bAllZeroQty || bIsDL || bIsNoThirdParty);
+                                var bIsNoOpenQty = bAllZeroQty && !bHasOrders;
                                 var bShowZeroQty = bHasOrders && (bIsDL || bIsNoThirdParty);
 
                                 var oFinalHeader = Object.assign({}, oHeader, {
                                     __isAssigned: bIsFullyAssigned,
                                     __isPartiallyAssigned: bHasOrders && !bIsFullyAssigned,
+                                    __isNoOpenQty: bIsNoOpenQty,
                                     __thirdPartyRaw: sThirdPartyRaw
                                 });
                                 if (oFinalHeader.ToItem && oFinalHeader.ToItem.results) {
@@ -398,7 +486,11 @@ sap.ui.define([
                     if (sAssignmentStatus === "partial" && !oHeader.__isPartiallyAssigned) {
                         return false;
                     }
-                    if (sAssignmentStatus === "unassigned" && (oHeader.__isAssigned || oHeader.__isPartiallyAssigned)) {
+                    if (sAssignmentStatus === "noOpenQty" && !oHeader.__isNoOpenQty) {
+                        return false;
+                    }
+                    if (sAssignmentStatus === "unassigned" &&
+                        (oHeader.__isAssigned || oHeader.__isPartiallyAssigned || oHeader.__isNoOpenQty)) {
                         return false;
                     }
                 }
@@ -422,7 +514,14 @@ sap.ui.define([
                             return false;
                         }
                         var fAvail = oItem.__showZeroQty ? 0 : parseFloat(oItem.KWMENG || "0");
-                        return bHasReqQty ? (fAvail >= fReqQty) : (fAvail > 0);
+                        // The user enters Min. Quantity in MT, but sales-document
+                        // quantities (KWMENG) are stored in the document UOM — KG for
+                        // these products. Convert the entered MT figure into the item's
+                        // unit before comparing: 1 MT = 1000 KG. A non-KG item is assumed
+                        // to already be in MT and is compared directly.
+                        var sUom = (oItem.VRKME || "").trim().toUpperCase();
+                        var fReqInItemUom = (sUom === "KG") ? (fReqQty * 1000) : fReqQty;
+                        return bHasReqQty ? (fAvail >= fReqInItemUom) : (fAvail > 0);
                     });
                     if (!bMatch) {
                         return false;
@@ -622,14 +721,18 @@ sap.ui.define([
                             });
                         }
 
-                        // DL orders and NO/N/A third-party orders are fully assigned as soon as bulk indent exists
+                        // Fully assigned requires at least one bulk indent (bHasOrders).
+                        // All-zero qty with no bulk indent = "No Open Qty", not fully assigned.
                         var bIsDL = oHeader.VSBED === "DL";
-                        var bIsAssigned = bAllZero || (bHasOrders && (bIsDL || bIsNoThirdParty));
+                        var bIsAssigned = bHasOrders && (bAllZero || bIsDL || bIsNoThirdParty);
+                        var bIsNoOpenQty = bAllZero && !bHasOrders;
                         var bShowZeroQty = bHasOrders && (bIsDL || bIsNoThirdParty);
 
                         var oUpdatedHeader = Object.assign({}, oHeader, {
+                            __allZeroQty: bAllZero,
                             __isAssigned: bIsAssigned,
                             __isPartiallyAssigned: bHasOrders && !bIsAssigned,
+                            __isNoOpenQty: bIsNoOpenQty,
                             __thirdPartyRaw: sThirdPartyRaw
                         });
                         if (oUpdatedHeader.ToItem && oUpdatedHeader.ToItem.results) {
@@ -816,6 +919,7 @@ sap.ui.define([
                             sessionStorage.removeItem("portal_isLoggedIn");
                             sessionStorage.removeItem("portal_username");
                             sessionStorage.removeItem("portal_token");
+                            sessionStorage.removeItem("portal_userfullname");
                             // Full reload clears SAPUI5 model state (CSRF token, auth headers).
                             // Component.js will find no portal_isLoggedIn and route guard
                             // will redirect the user to the login screen.
@@ -883,7 +987,7 @@ sap.ui.define([
             }
 
             // Format the title - Sales Order, Shipping, then net value
-            var sTitle = "Sales Document: " + sSalesOrder + "     •     " + sShipping + "     •     Net Value: " + sNetValue + " " + sCurrency;
+            var sTitle = "Contract: " + sSalesOrder + "     •     " + sShipping + "     •     Net Value: " + sNetValue + " " + sCurrency;
 
             // Create and return the GroupHeaderListItem
             var oGroupHeader = new GroupHeaderListItem({

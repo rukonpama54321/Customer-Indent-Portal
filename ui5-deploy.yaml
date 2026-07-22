@@ -17,6 +17,6 @@ builder:
           name: ZCUST_INDENT
           description: Customer Indent Portal
           package: ZSD
-          transport: D01K949622   # e.g. ECDK900123 - replace with the TR you created in the backend
+          transport: P01K962621   # e.g. ECDK900123 - replace with the TR you created in the backend
         exclude:
           - /test/
