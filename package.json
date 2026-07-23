@@ -19,6 +19,9 @@
 		"deploy": "fiori deploy --config ui5-deploy.yaml",
 		"undeploy": "fiori undeploy --config ui5-deploy.yaml",
 		"deploy-test": "fiori deploy --config ui5-deploy.yaml --testMode true",
+		"deploy-dev": "fiori deploy --config ui5-deploy-dev.yaml",
+		"undeploy-dev": "fiori undeploy --config ui5-deploy-dev.yaml",
+		"deploy-dev-test": "fiori deploy --config ui5-deploy-dev.yaml --testMode true",
 		"deploy-config": "fiori add deploy-config"
 	},
 	"devDependencies": {

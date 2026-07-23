@@ -184,7 +184,7 @@ sap.ui.define([
             var oModel = oView.getModel();
             var aFilters = [new Filter("BSTDK", FilterOperator.BT, sFromDate, sToDate)];
 
-            oModel.read("/SALESORDERHeaderSet", {
+            oModel.read("/ContractHeaderSet", {
                 filters: aFilters,
                 urlParameters: {
                     "$expand": "ToItem"
@@ -243,8 +243,9 @@ sap.ui.define([
                             // Build a lookup: normSALESORDER → { MATNR: original KWMENG }
                             var oOrigQtyLookup = {};
                             aCustOrders.forEach(function (oCust) {
-                                if (oCust.SALESORDER) {
-                                    var sKey = fnNorm(oCust.SALESORDER);
+                                var sCustContract = oCust.CONTRACT || oCust.SALESORDER;
+                                if (sCustContract) {
+                                    var sKey = fnNorm(sCustContract);
                                     var sThirdParty = oCust.THIRDPARTY || "";
                                     var bIsNoOrNA = (sThirdParty === "0" || sThirdParty === "N" || sThirdParty === "NO" ||
                                                      sThirdParty === "3" || sThirdParty === "N/A");
@@ -381,7 +382,7 @@ sap.ui.define([
                 return;
             }
 
-            oModel.read("/SALESORDERItemSet", {
+            oModel.read("/ContractItemSet", {
                 urlParameters: {
                     "$select": "MATNR,ARKTX",
                     "$top": "5000"
@@ -692,8 +693,9 @@ sap.ui.define([
                     var oSalesOrderThirdPartyRaw = {};
 
                     aCustOrders.forEach(function (oCust) {
-                        if (oCust.SALESORDER) {
-                            var sKey = fnNorm(oCust.SALESORDER);
+                        var sCustContract = oCust.CONTRACT || oCust.SALESORDER;
+                        if (sCustContract) {
+                            var sKey = fnNorm(sCustContract);
                             var sThirdParty = oCust.THIRDPARTY || "";
                             var bIsNoOrNA = (sThirdParty === "0" || sThirdParty === "N" || sThirdParty === "NO" ||
                                              sThirdParty === "3" || sThirdParty === "N/A");
@@ -953,7 +955,7 @@ sap.ui.define([
             
             // Find the first order with this sales order number to get NETWR, WAERK, and SHIP_COND
             var oFirstOrderInGroup = aCreatedOrders.find(function(oOrder) {
-                return oOrder.SALESORDER === sSalesOrder;
+                return (oOrder.CONTRACT || oOrder.SALESORDER) === sSalesOrder;
             });
             
             var sNetValue = "";

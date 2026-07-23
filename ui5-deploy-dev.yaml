@@ -1,0 +1,22 @@
+specVersion: "4.0"
+metadata:
+  name: customerindent
+type: application
+builder:
+  resources:
+    excludes:
+      - "/test/**"
+  customTasks:
+    - name: deploy-to-abap
+      afterTask: generateCachebusterInfo
+      configuration:
+        target:
+          url: http://eccdev.nrl.com:8000
+          client: "300"
+        app:
+          name: ZCUST_INDENT
+          description: Customer Indent Portal
+          package: ZSD
+          transport: D01K949822     # IT DEV - paste the TR you created in the backend here
+        exclude:
+          - /test/
