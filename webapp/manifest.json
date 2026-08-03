@@ -179,13 +179,6 @@
                     ]
                 },
                 {
-                    "name": "BulkPortal",
-                    "pattern": "bulk",
-                    "target": [
-                        "TargetBulkPortal"
-                    ]
-                },
-                {
                     "pattern": "ChangeIndentWithVehicleTab",
                     "name": "ChangeIndentWithVehicleTab",
                     "target": "ChangeIndentWithVehicleTab"
@@ -275,13 +268,6 @@
                     "clearControlAggregation": false,
                     "viewId": "EntryPage",
                     "viewName": "EntryPage"
-                },
-                "TargetBulkPortal": {
-                    "viewType": "XML",
-                    "transition": "slide",
-                    "clearControlAggregation": false,
-                    "viewId": "BulkPortal",
-                    "viewName": "BulkPortal"
                 },
                 "ChangeIndentWithVehicleTab": {
                     "viewName": "ChangeIndentWithVehicleTab",
